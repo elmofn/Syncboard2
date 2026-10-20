@@ -75,8 +75,16 @@ Banco CosmosDB `TasksDB`. Containers: `Tasks` (PK `/id`), `Users` (PK `/email`, 
   "pendingAlerts": [ /* ver 4.5 */ ],
   "history": [ /* ver 4.6 */ ],    // embutido; description contém HTML
   "continuityInstructions": "string", // definido no "forward" da homologação
-  "requester": { /* provência: quem pediu, derivado do auth */ },
-  "assignmentHistory": [ /* trilha de atribuições */ ],
+  "requester": {                   // server-owned; derivado do auth, nunca do cliente (createProvenance)
+    "email": "quem@criou.com", "name": "Nome",
+    "source": "self_declared", "recordedByEmail": "quem@criou.com",
+    "recordedAt": "ISO-8601", "evidenceRef": null
+  },
+  "assignmentHistory": [           // server-owned; +1 entrada só quando os responsáveis mudam (applyProvenance)
+    { "at": "ISO-8601", "actorEmail": "quem@mudou.com",
+      "from": [ { "email": "a@x.com", "name": "Ana" } ],   // snapshot anterior
+      "to":   [ { "email": "b@x.com", "name": "Bia" } ] }   // snapshot novo
+  ],
   "notificationStageVersion": 0,      // watermark server-owned (notificações)
   "notificationsReadThroughStage": -1,
   "createdBy": "Nome do criador",     // string (display name)
@@ -84,6 +92,8 @@ Banco CosmosDB `TasksDB`. Containers: `Tasks` (PK `/id`), `Users` (PK `/email`, 
   "_etag": "\"...\""                  // concorrência
 }
 ```
+
+> `requester` e `assignmentHistory` são **read-only** para o cliente: o front pode exibi-los (auditoria de quem pediu e das trocas de responsável), mas se enviá-los numa escrita eles são descartados. `from`/`to` são arrays de snapshots `{email, name}`, não strings.
 
 ### 4.2 User (container `Users`)
 ```jsonc
