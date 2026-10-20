@@ -231,9 +231,9 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify }
                         <li key={c.id} className="comment">
                           <Avatar person={typeof c.author === 'object' ? c.author : { email: '', name: String(c.author) }} small />
                           <div className="comment__main">
-                            <div className="comment__meta sb-meta">
-                              <strong>{personName(c.author as PersonRef)}</strong> · {fmt(c.timestamp)}
-                              {c.editedAt && ' (editado)'}
+                            <div className="comment__who">
+                              <strong>{personName(c.author as PersonRef)}</strong>
+                              <small className="sb-meta">{fmt(c.timestamp)}{c.editedAt ? ' · editado' : ''}</small>
                             </div>
                             {isEditing ? (
                               <div className="comment__edit">
@@ -254,14 +254,16 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify }
                               </div>
                             ) : (
                               <>
-                                <Html className="comment__text" html={c.text} />
-                                {cAtts.length > 0 && (
-                                  <div className="comment__atts">
-                                    {cAtts.map((a, j) => (
-                                      <a key={j} className="editor__attach-chip" href={a.url} target="_blank" rel="noreferrer">📄 {a.name}</a>
-                                    ))}
-                                  </div>
-                                )}
+                                <div className="comment__bubble">
+                                  <Html className="comment__text" html={c.text} />
+                                  {cAtts.length > 0 && (
+                                    <div className="comment__atts">
+                                      {cAtts.map((a, j) => (
+                                        <a key={j} className="editor__attach-chip" href={a.url} target="_blank" rel="noreferrer">📄 {a.name}</a>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
                                 {editable && (
                                   <div className="comment__actions">
                                     <button type="button" onClick={() => setEditingId(c.id)}>Editar</button>

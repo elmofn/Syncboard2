@@ -1666,3 +1666,22 @@
   min-height: 60px;
   padding: var(--sb-sp-3);
 }
+.comment__who {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+.comment__who strong {
+  font-size: var(--sb-fs-control);
+  color: var(--sb-text);
+}
+.comment__bubble {
+  border: 1px solid var(--sb-panel-border);
+  background: var(--sb-bg);
+  border-radius: var(--sb-radius-card);
+  padding: var(--sb-sp-3) var(--sb-sp-4);
+  margin-top: 2px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sb-sp-2);
+}
