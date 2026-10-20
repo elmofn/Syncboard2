@@ -115,19 +115,50 @@ Layout **split** em duas colunas:
 ### 4.2 Pilot de componentes (`app/ui-v2.html`)
 Showcase completo da biblioteca acima (marca em escala, botões, chips, campos, badges, estado vazio, carregamento/erro, modal, toast), em claro e escuro — é a **referência canônica de componentes** para o `web/`.
 
-## 5. O que ainda falta capturar (precisa de referência do usuário)
+## 5. Telas reais (layout) — capturado
 
-As telas com dados reais **não renderizam headless** (a `index.html` fica na splash de carregamento sem `/api` + `/.auth/me`, e não há login possível em produção). Para fidelidade de **layout/composição** dessas telas, preciso de **screenshots suas** (ou vídeo), de preferência em desktop e, se der, mobile:
+Referência em `docs/design-reference/real/` (screenshots do app em produção: `real-lista.webp`, `real-quadro.webp`, `real-detalhe-topo.png`, `real-detalhe-comentarios.png`). O layout real é mais rico que o scaffold inicial — pontos principais:
 
-1. **Quadro Kanban** — colunas por status, com alguns cards preenchidos.
-2. **Visão em Lista** — com filtros aplicados.
-3. **Home/Início** (se existir como tela separada).
-4. **Detalhe da tarefa** (modal) — título, descrição, responsáveis, anexos, comentários/menções, histórico.
-5. **Fluxo de Homologação** — a tela/ação de aprovar/reprovar/encaminhar.
-6. **Pessoas** (lista/gestão de usuários) e **Notificações** (sininho/badge).
-7. **Shell de navegação** — topo/lateral do app logado (tenho um preview parcial em `ui-v2-shell-preview.html`, mas o real é melhor).
+### 5.1 Shell / navegação — **sidebar à esquerda** (não top-bar)
+Coluna fixa à esquerda (fundo escuro `ink`), de cima para baixo:
+- **Marca:** cubo + "SyncBOARD".
+- **Seletor de WORKSPACE:** avatar/badge + nome ("SyncBoard NT") com dropdown.
+- **Seletor de BOARD:** ícone + nome ("Quadro de trabalho") com dropdown.
+- **Seção TRABALHO:** Home · Quadro (com badge de contagem, ex. `7`) · Lista · Arquivados. Item ativo destacado em **lima** (`accent`).
+- **Seção PROJETOS:** lista de projetos com ponto colorido + nome + contagem `ativas/total` (ex. "SBNT 5/49", "Teste de Capacidade 2/5"). → alimentado por `GET /api/getProjectTaskCounts` (`{project, active, total}`).
+- **Seção CONFIGURAÇÃO:** Workspace · Boards · Users.
+- **Rodapé:** card do usuário atual (avatar + nome + cargo "Mobile Architect" + ícone de ajustes).
 
-Com esses screenshots, fecho o mapeamento de layout e o `docs/DESIGN-SYSTEM.md` passa a cobrir 100% das telas; os **tokens e componentes** acima já servem de base imediata para começar o `web/`.
+> Workspace/Board aparecem como seletores, mas o backend atual **não tem entidades de workspace/board** — tasks só têm `project` (string). Tratar esses seletores como estrutura de navegação (hoje efetivamente um workspace/board únicos); projetos são derivados de `getProjectTaskCounts`.
+
+### 5.2 Barra superior + cabeçalho + filtros
+- **Top bar:** breadcrumb ("Espaço de trabalho / Lista"), à direita **sino de notificações** + avatar do usuário.
+- **Cabeçalho:** eyebrow "SYNCBOARD", título (ex. "Lista de tarefas" / "Quadro de trabalho"), subtítulo, e botão **"+ Nova Tarefa"** (cobalto) à direita.
+- **Barra de filtros:** busca "Buscar por título ou ID" + selects "Todos os projetos / usuários / prioridades / estados" + "Limpar".
+- **Linha de controle:** "N tarefas encontradas", ordenação (ex. "Criação · decrescente") e **toggle de visão Quadro | Lista**.
+
+### 5.3 Quadro (Kanban)
+- Colunas por status com ícone + nome + **contagem** e **borda superior colorida** por status (Fila cinza, Parado laranja, Andamento azul, Homologação roxo, Publicação verde).
+- **Card:** `TC-id` · prioridade (bandeira + "Média") · prazo ("Sem prazo") · menu "…"; **título**; chip do projeto (ponto + nome); **"Progresso informado"** com barra + `%`; rodapé com **avatares em fluxo** (responsável/encaminhamentos: `avatar → avatar → avatar`) e **contador de comentários** (💬 N).
+- Coluna vazia: "Nenhuma tarefa nesta etapa." (tracejado).
+
+### 5.4 Lista (tabela)
+Colunas: **Tarefa** (TC-id · projeto, título, "Criação: data · N anexos") · **Estado** (badge) · **Solicitante** · **Responsáveis** · **Homologador** ("Não informado" quando ausente) · **Prioridade** (bandeira) · **Prazo** · **Progresso** (barra + %) · ação de excluir (lixeira).
+
+### 5.5 Detalhe da tarefa (modal, 2 colunas)
+- **Cabeçalho:** chip `#TC-id` + chip de status; botão X.
+- **Coluna esquerda (conteúdo):** título; blocos com **borda colorida à esquerda**: "Descrição da Tarefa" (verde), "Atualização de Progresso" (azul, com badge de %), "Orientação de Continuidade" (roxo — `continuityInstructions`). Abaixo, **abas**: **Comentários (N) · Anexos (N) · Histórico**. Comentários têm editor rich-text (toolbar B/I/U/lista), placeholder "Escreva um comentário (use @ para mencionar)…", botão enviar (avião cobalto) e botão "Adicionar" (anexo); texto de ajuda ("Enter envia; Shift+Enter…").
+- **Coluna direita ("Resumo"):** Projeto (chip), Prioridade, Prazo; **"Fluxo"** = timeline vertical (Solicitante → Responsável → Responsável principal → Homologador) com carimbos de data e marcações como "Atenção solicitada" — montado de `requester` + `assignmentHistory` + `pendingAlerts` + `homologador`. Barra de **Progresso %**. Ações: **"Marcar reunião"** e **"Chamar atenção"** (= `signalResponsible`).
+- **Rodapé:** "Alterações e comentários usam as ações desta tarefa." · **Fechar** · **Editar tarefa** (cobalto).
+
+### 5.6 Pontos novos observados (contrato/dados)
+- **`progress`** (0–100) existe na tarefa (barra "Progresso"; `updateTask` seta `progress:100` ao aprovar homologação). Documentar como campo no `docs/API.md` (adendo da Fase 1b).
+- **"Marcar reunião"** sugere integração de **calendário** — reconcilia o escopo Google `auth/calendar` (que eu havia marcado como "não usado"); confirmar se cria evento (pode ser feature parcial/planejada).
+- **"Chamar atenção"** = `POST /api/signalResponsible/{id}`; o selo de alerta no card/fluxo = `pendingAlerts`.
+- Card/linha mostram **contagem de anexos** e **de comentários** (derivados dos arrays embutidos).
+
+### 5.7 Ainda sem referência (opcional)
+Home, Pessoas (Users), Arquivados, painel de Notificações (conteúdo do sino) e os seletores de Workspace/Board abertos. Não bloqueiam o avanço; peço quando chegarmos nessas telas.
 
 ## 6. Próximo uso (no `web/`)
 Estes tokens viram a única fonte de tema (CSS vars + config do Tailwind), e os componentes acima viram os primeiros componentes React. Nenhuma linha de `custom.css`/`*-v2.css` é portada — reproduz-se a partir destes valores + da referência renderizada.
