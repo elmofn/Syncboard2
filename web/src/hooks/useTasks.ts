@@ -56,5 +56,25 @@ export function useTasks() {
     }
   }, []);
 
-  return { tasks, error, moveTask, reload: load };
+  /** Reordena (e opcionalmente move de coluna) definindo um novo `order`. */
+  const reorderTask = useCallback(
+    async (id: string, status: TaskStatus, order: number, prevStatus?: TaskStatus, etag?: string) => {
+      setTasks((prev) => prev?.map((t) => (t.id === id ? { ...t, status, order } : t)) ?? prev);
+      try {
+        const patch: Record<string, unknown> = { order };
+        if (prevStatus && prevStatus !== status) {
+          patch.status = status;
+          patch.expectedStatus = prevStatus;
+          patch.expectedEtag = etag;
+        }
+        await api.updateTask(id, patch);
+      } catch (e) {
+        setError(e instanceof Error ? e.message : 'Falha ao reordenar.');
+        load();
+      }
+    },
+    [load],
+  );
+
+  return { tasks, error, moveTask, reorderTask, reload: load };
 }

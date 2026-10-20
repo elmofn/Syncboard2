@@ -24,7 +24,7 @@ const HEADER: Record<View, { title: string; subtitle: string }> = {
 };
 
 export function Workspace({ user }: { user: ClientPrincipal }) {
-  const { tasks, error, moveTask } = useTasks();
+  const { tasks, error, moveTask, reorderTask } = useTasks();
   const [users, setUsers] = useState<User[]>([]);
   const [projects, setProjects] = useState<ProjectCount[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -158,7 +158,7 @@ export function Workspace({ user }: { user: ClientPrincipal }) {
 
           {error && <div className="workspace__notice workspace__notice--error">{error}</div>}
 
-          {view === 'quadro' && <Board tasks={filtered} moveTask={moveTask} onOpen={(t) => setOpenId(t.id)} notify={flash} />}
+          {view === 'quadro' && <Board tasks={filtered} moveTask={moveTask} reorderTask={reorderTask} onOpen={(t) => setOpenId(t.id)} notify={flash} />}
           {view === 'lista' && <ListView tasks={filtered} onOpen={(t) => setOpenId(t.id)} />}
           {view === 'arquivados' && <ListView tasks={archived ?? []} onOpen={(t) => setOpenId(t.id)} />}
           {view === 'pessoas' && (
