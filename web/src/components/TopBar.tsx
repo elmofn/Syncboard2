@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { ClientPrincipal, Notification } from '../types/api';
 import { Avatar } from './Avatar';
 import { NotificationsPanel } from './NotificationsPanel';
+import { ThemeToggle } from './ThemeToggle';
 
 interface Props {
   user: ClientPrincipal;
@@ -34,6 +35,7 @@ export function TopBar({ user, crumb, notifications, onMarkRead, onOpenTask }: P
         <span className="topbar__crumb-current">{crumb}</span>
       </nav>
       <div className="topbar__actions">
+        <ThemeToggle className="topbar__bell" />
         <div className="topbar__notif" ref={ref}>
           <button type="button" className="topbar__bell" aria-label="Notificações" aria-expanded={open} onClick={() => setOpen((v) => !v)}>
             🔔

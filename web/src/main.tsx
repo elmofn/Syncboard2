@@ -4,6 +4,9 @@ import './styles/theme.css';
 import './styles/base.css';
 import './styles/app.css';
 import App from './App';
+import { initTheme } from './lib/theme';
+
+initTheme();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

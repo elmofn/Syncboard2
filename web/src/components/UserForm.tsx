@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { User } from '../types/api';
 import { api } from '../lib/api';
+import { useEscape } from '../lib/useEscape';
 
 interface Props {
   mode: 'create' | 'edit';
@@ -18,6 +19,7 @@ export function UserForm({ mode, user, onClose, onSaved, notify }: Props) {
   const [isAdmin, setIsAdmin] = useState(user?.isAdmin === true);
   const [isAiAgent, setIsAiAgent] = useState(user?.isAiAgent === true);
   const [saving, setSaving] = useState(false);
+  useEscape(onClose);
 
   const save = async () => {
     if (!email.trim() || !displayName.trim()) {

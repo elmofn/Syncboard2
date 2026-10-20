@@ -100,7 +100,13 @@ export function CommentEditor({ users, onSubmit, notify }: Props) {
       if (matches[0]) pickMention(matches[0]);
       return;
     }
-    if (e.key === 'Escape') return setMenu(null);
+    if (e.key === 'Escape') {
+      if (menu !== null) {
+        e.stopPropagation();
+        setMenu(null);
+      }
+      return;
+    }
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       void send();

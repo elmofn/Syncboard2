@@ -1,9 +1,11 @@
 import { login } from '../lib/auth';
 import { IS_MOCK } from '../lib/config';
+import { ThemeToggle } from './ThemeToggle';
 
 export function Login() {
   return (
     <div className="login">
+      <ThemeToggle className="login__theme" />
       <aside className="login__brand">
         <img className="login__logo" src="/brand/logo-primary-dark.svg" alt="SyncBOARD" height={48} />
         <img className="login__cube" src="/brand/mark-primary.svg" alt="" width={180} height={180} />

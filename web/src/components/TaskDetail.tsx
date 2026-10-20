@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import type { Task, User, ClientPrincipal, PersonRef, Attachment } from '../types/api';
 import { personName } from '../types/api';
 import { api } from '../lib/api';
+import { useEscape } from '../lib/useEscape';
 import { buildTaskFlow } from '../lib/flow';
 import { Avatar } from './Avatar';
 import { StatusBadge } from './StatusBadge';
@@ -47,6 +48,7 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify }
   const [attnOpen, setAttnOpen] = useState(false);
   const [attnTargets, setAttnTargets] = useState<string[]>([]);
   const attachRef = useRef<HTMLInputElement>(null);
+  useEscape(onClose);
 
   const responsibles = Array.isArray(task.responsible) ? task.responsible : [];
   const comments = Array.isArray(task.comments) ? task.comments : [];
@@ -175,7 +177,7 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify }
             <span className="modal__chip">#{task.id}</span>
             <StatusBadge status={task.status} />
           </div>
-          <button type="button" className="modal__close" onClick={onClose} aria-label="Fechar">✕</button>
+          <button type="button" className="modal__close" onClick={onClose} aria-label="Fechar" autoFocus>✕</button>
         </header>
 
         <div className="modal__body">

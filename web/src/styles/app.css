@@ -1685,3 +1685,26 @@
   flex-direction: column;
   gap: var(--sb-sp-2);
 }
+
+/* ---------- Toggle de tema ---------- */
+.theme-toggle {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--sb-radius-control);
+  border: 1px solid var(--sb-panel-border);
+  background: var(--sb-panel);
+  cursor: pointer;
+}
+.login__theme {
+  position: absolute;
+  top: var(--sb-sp-5);
+  right: var(--sb-sp-5);
+  z-index: 3;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--sb-radius-control);
+  border: 1px solid var(--sb-panel-border);
+  background: var(--sb-panel);
+  cursor: pointer;
+  font-size: 16px;
+}

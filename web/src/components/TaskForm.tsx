@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import type { Task, User, Attachment, Person } from '../types/api';
 import { personName } from '../types/api';
 import { api } from '../lib/api';
+import { useEscape } from '../lib/useEscape';
 import { BOARD_COLUMNS, STATUS_META } from '../lib/status';
 
 const PRIORITIES = ['Baixa', 'Média', 'Alta'];
@@ -36,6 +37,7 @@ export function TaskForm({ mode, task, users, onClose, notify }: Props) {
   const [improving, setImproving] = useState(false);
   const [saving, setSaving] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  useEscape(onClose);
 
   const addResponsible = (email: string) => {
     const u = users.find((x) => x.email === email);
