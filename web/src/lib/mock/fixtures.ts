@@ -34,8 +34,12 @@ export const mockTasks: Task[] = [
   {
     id: 'TC-001', numericId: 1, title: 'Tela de login nova', description: 'Reconstruir o login no web/.',
     responsible: [P.ana], status: 'inprogress', priority: 'Alta', progress: 40, project: 'Frontend', projectColor: '#244FDB',
-    order: -now, createdAt: iso(600), createdBy: 'Ana Souza', _etag: '"m1"',
+    order: -now, createdAt: iso(600), createdBy: 'Ana Souza', requester: P.ana, _etag: '"m1"',
     comments: [{ id: 'c1', text: 'Comecei pelo layout split.', author: P.ana, timestamp: iso(120) }],
+    history: [
+      { action: 'created', description: 'Tarefa criada por <b>Ana Souza</b>', timestamp: iso(600) },
+      { action: 'edited', description: 'Status alterado para <b>Andamento</b>', timestamp: iso(300) },
+    ],
   },
   {
     id: 'TC-002', numericId: 2, title: 'Contrato da API', description: 'Documentar endpoints.',
@@ -45,7 +49,17 @@ export const mockTasks: Task[] = [
   {
     id: 'TC-003', numericId: 3, title: 'Mapear acesso do agente', description: 'API direta para o DOT.',
     responsible: [P.caio], homologador: P.bia, status: 'homologation', priority: 'Alta', progress: 100, project: 'Backend', projectColor: '#713AA3',
-    order: -now + 2000, createdAt: iso(400), createdBy: 'Caio Melo', _etag: '"m3"',
+    order: -now + 2000, createdAt: iso(400), createdBy: 'Caio Melo', requester: P.ana, _etag: '"m3"',
+    continuityInstructions: 'Validar o fluxo de chave de API antes de publicar.',
+    attachments: [{ url: 'https://example.com/spec.pdf', name: 'spec-agente.pdf', contentType: 'application/pdf' }],
+    comments: [
+      { id: 'c3a', text: 'Subi a proposta de endpoints <b>/api/agent</b>.', author: P.caio, timestamp: iso(90) },
+      { id: 'c3b', text: 'Revisando a parte de autenticação.', author: P.bia, timestamp: iso(30) },
+    ],
+    history: [
+      { action: 'created', description: 'Tarefa criada por <b>Caio Melo</b>', timestamp: iso(400) },
+      { action: 'edited', description: 'Status alterado para <b>Homologação</b><br>Homologador designado: <b>Bia Lima</b>', timestamp: iso(120) },
+    ],
   },
   {
     id: 'TC-004', numericId: 4, title: 'Limpeza do CSS legado', description: 'Remover custom.css e *-v2.css.',

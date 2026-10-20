@@ -68,6 +68,8 @@ export interface Task {
   continuityInstructions?: string;
   createdBy?: string;
   createdAt?: string;
+  requester?: { email: string; name: string; [key: string]: unknown } | null;
+  assignmentHistory?: unknown[];
   notificationStageVersion?: number;
   notificationsReadThroughStage?: number;
   _etag?: string;

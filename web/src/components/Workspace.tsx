@@ -10,6 +10,7 @@ import { WorkHeader } from './WorkHeader';
 import { FilterBar } from './FilterBar';
 import { Board } from './Board';
 import { ListView } from './ListView';
+import { TaskDetail } from './TaskDetail';
 
 const HEADER: Record<View, { title: string; subtitle: string }> = {
   home: { title: 'Home', subtitle: 'Um resumo do seu trabalho.' },
@@ -27,6 +28,7 @@ export function Workspace({ user }: { user: ClientPrincipal }) {
   const [view, setView] = useState<View>('quadro');
   const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS);
   const [notice, setNotice] = useState<string | null>(null);
+  const [openId, setOpenId] = useState<string | null>(null);
 
   useEffect(() => {
     api.getUsers().then(setUsers).catch(() => undefined);
@@ -46,6 +48,7 @@ export function Workspace({ user }: { user: ClientPrincipal }) {
 
   const activeTasks = tasks ?? [];
   const filtered = useMemo(() => filterTasks(activeTasks, filters), [activeTasks, filters]);
+  const openTask = openId ? [...activeTasks, ...(archived ?? [])].find((t) => t.id === openId) ?? null : null;
 
   const projectNames = projects.length
     ? projects.map((p) => p.project)
@@ -124,18 +127,22 @@ export function Workspace({ user }: { user: ClientPrincipal }) {
 
           {error && <div className="workspace__notice workspace__notice--error">{error}</div>}
 
-          {view === 'quadro' && (
-            <Board tasks={filtered} moveTask={moveTask} onOpen={() => flash('Detalhe da tarefa chega no próximo passo.')} />
-          )}
-          {view === 'lista' && (
-            <ListView tasks={filtered} onOpen={() => flash('Detalhe da tarefa chega no próximo passo.')} />
-          )}
-          {view === 'arquivados' && (
-            <ListView tasks={archived ?? []} onOpen={() => flash('Detalhe da tarefa chega no próximo passo.')} />
-          )}
+          {view === 'quadro' && <Board tasks={filtered} moveTask={moveTask} onOpen={(t) => setOpenId(t.id)} />}
+          {view === 'lista' && <ListView tasks={filtered} onOpen={(t) => setOpenId(t.id)} />}
+          {view === 'arquivados' && <ListView tasks={archived ?? []} onOpen={(t) => setOpenId(t.id)} />}
           {view === 'home' && <p className="sb-meta">Home chega em um próximo passo.</p>}
         </div>
       </div>
+
+      {openTask && (
+        <TaskDetail
+          task={openTask}
+          users={users}
+          currentUser={user}
+          onClose={() => setOpenId(null)}
+          notify={flash}
+        />
+      )}
     </div>
   );
 }

@@ -151,6 +151,15 @@ Colunas: **Tarefa** (TC-id · projeto, título, "Criação: data · N anexos") �
 - **Coluna direita ("Resumo"):** Projeto (chip), Prioridade, Prazo; **"Fluxo"** = timeline vertical (Solicitante → Responsável → Responsável principal → Homologador) com carimbos de data e marcações como "Atenção solicitada" — montado de `requester` + `assignmentHistory` + `pendingAlerts` + `homologador`. Barra de **Progresso %**. Ações: **"Marcar reunião"** e **"Chamar atenção"** (= `signalResponsible`).
 - **Rodapé:** "Alterações e comentários usam as ações desta tarefa." · **Fechar** · **Editar tarefa** (cobalto).
 
+### 5.5.1 Detalhe — abas, histórico, ações e edição (prints adicionais)
+Referência: `real-detalhe-historico.png`, `real-detalhe-homologacao.png`, `real-detalhe-editar.png`, `real-detalhe-anexos.png`.
+- **Aba Histórico:** timeline (mais recente no topo). Cada item = ícone redondo por tipo (lápis = `edited`, megafone = `attention_requested`, "+" = `created`), texto da ação em negrito (status/nomes em bold), sub-linhas (ex.: "Responsável pela continuidade: …", "Orientação de continuidade: …", "Editou: Responsáveis") e carimbo (data, hora). Vem de `task.history` (`description` em HTML com `<br>`).
+- **Aba Anexos:** cada anexo = ícone de arquivo + nome + legenda ("Vinculado à tarefa" ou "Arquivo com link") + botão visualizar (olho); no modo edição também excluir (lixeira).
+- **Ações (coluna direita) por status:**
+  - `homologation`: **Aprovar** (cobalto), **Encaminhar** (secundário), **Reprovar** (contorno vermelho) — mapeiam para `updateTask` com `homologationAction` approve/forward/reject. Encaminhar pede novo responsável + orientação.
+  - demais status: **Chamar atenção** (= `signalResponsible`) e **Marcar reunião** (calendário — a confirmar).
+- **Editar tarefa** (botão no rodapé) abre um **formulário** (print `real-detalhe-editar.png`): Título (+ "Melhorar título com IA" = `improveTitle`), Descrição, Anexos (+ Adicionar); coluna direita: Link DevOps/externo (`azureLink`), Responsáveis (chips; o primeiro é o principal), Status, Projeto (+ seletor de cor → `updateProjectColor`), Prioridade, Prazo (+ "Sem data"). Rodapé: Cancelar / Salvar Tarefa. → próximo passo após o detalhe.
+
 ### 5.6 Pontos novos observados (contrato/dados)
 - **`progress`** (0–100) existe na tarefa (barra "Progresso"; `updateTask` seta `progress:100` ao aprovar homologação). Documentar como campo no `docs/API.md` (adendo da Fase 1b).
 - **"Marcar reunião"** sugere integração de **calendário** — reconcilia o escopo Google `auth/calendar` (que eu havia marcado como "não usado"); confirmar se cria evento (pode ser feature parcial/planejada).

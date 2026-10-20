@@ -1,10 +1,23 @@
 import type { ApiClient, TaskPatch } from './apiClient';
-import type { Task, CreateTaskPayload } from '../types/api';
+import type { Task, CreateTaskPayload, Attachment, HistoryEntry } from '../types/api';
 import { store } from './mock/store';
+import { mockCurrentPrincipal } from './mock/fixtures';
 
 const clone = <T,>(v: T): T => JSON.parse(JSON.stringify(v));
 const delay = (ms = 120) => new Promise((r) => setTimeout(r, ms));
 const newEtag = () => `"m${Math.random().toString(36).slice(2, 8)}"`;
+const uid = () => Math.random().toString(36).slice(2, 10);
+const actorName = () =>
+  mockCurrentPrincipal.claims?.find((c) => c.typ === 'name')?.val || mockCurrentPrincipal.userDetails;
+
+const STATUS_LABEL: Record<string, string> = {
+  todo: 'Fila', stopped: 'Parado', inprogress: 'Andamento',
+  homologation: 'Homologação', publication: 'Publicação', done: 'Concluída',
+};
+function pushHistory(task: Task, action: string, description: string) {
+  const entry: HistoryEntry = { action, description, timestamp: new Date().toISOString() };
+  task.history = [...(Array.isArray(task.history) ? task.history : []), entry];
+}
 
 // Campos que o servidor nunca aceita do cliente (ver docs/API.md §3).
 const SERVER_OWNED = new Set([
@@ -82,9 +95,40 @@ export const mockApi: ApiClient = {
     await delay();
     const task = store.tasks.find((t) => t.id === id);
     if (!task) throw new Error('Tarefa não encontrada.');
-    for (const [key, value] of Object.entries(patch)) {
-      if (SERVER_OWNED.has(key)) continue;
-      (task as unknown as Record<string, unknown>)[key] = value;
+    const oldStatus = task.status;
+
+    const action = patch.homologationAction as string | undefined;
+    if (action === 'approve') {
+      task.status = 'publication';
+      task.progress = 100;
+      pushHistory(task, 'edited', `Homologação aprovada por <b>${actorName()}</b>`);
+    } else if (action === 'reject') {
+      task.status = 'inprogress';
+      task.homologador = null;
+      pushHistory(task, 'edited', `Homologação reprovada por <b>${actorName()}</b>`);
+    } else if (action === 'forward') {
+      task.status = 'inprogress';
+      task.homologador = null;
+      task.continuityInstructions =
+        typeof patch.forwardInstructions === 'string' ? patch.forwardInstructions : '';
+      const email = String(patch.newResponsibleEmail || '').toLowerCase();
+      const prof = store.users.find((u) => u.email.toLowerCase() === email);
+      if (prof) task.responsible = [{ email: prof.email, name: prof.name }];
+      pushHistory(
+        task,
+        'edited',
+        `Homologação encaminhada por <b>${actorName()}</b><br>Orientação de continuidade: ${task.continuityInstructions}`,
+      );
+    } else {
+      for (const [key, value] of Object.entries(patch)) {
+        if (SERVER_OWNED.has(key)) continue;
+        (task as unknown as Record<string, unknown>)[key] = value;
+      }
+    }
+
+    if (task.status !== oldStatus) {
+      pushHistory(task, 'edited', `Status alterado para <b>${STATUS_LABEL[task.status] || task.status}</b>`);
+      task.pendingAlerts = [];
     }
     task._etag = newEtag();
     store.emit('taskUpdated', clone(task));
@@ -110,5 +154,38 @@ export const mockApi: ApiClient = {
     await delay();
     const n = store.notifications.find((x) => x.id === id);
     if (n) n.isRead = true;
+  },
+
+  async addComment(taskId: string, payload: { text: string; attachments?: Attachment[] }) {
+    await delay();
+    const task = store.tasks.find((t) => t.id === taskId);
+    if (!task) throw new Error('Tarefa não encontrada.');
+    const comment = {
+      id: uid(),
+      text: payload.text,
+      author: { email: mockCurrentPrincipal.userDetails, name: actorName() },
+      userId: mockCurrentPrincipal.userId,
+      timestamp: new Date().toISOString(),
+      ...(payload.attachments && payload.attachments.length ? { attachments: payload.attachments } : {}),
+    };
+    task.comments = [...(Array.isArray(task.comments) ? task.comments : []), comment];
+    task._etag = newEtag();
+    store.emit('taskUpdated', clone(task));
+    return clone(task);
+  },
+
+  async signalResponsible(taskId: string, targets: string[]) {
+    await delay();
+    const task = store.tasks.find((t) => t.id === taskId);
+    if (!task) throw new Error('Tarefa não encontrada.');
+    const ts = new Date().toISOString();
+    const keep = (Array.isArray(task.pendingAlerts) ? task.pendingAlerts : []).filter(
+      (a) => !targets.includes(a.targetUser),
+    );
+    task.pendingAlerts = [...keep, ...targets.map((t) => ({ targetUser: t, signaledBy: actorName(), timestamp: ts }))];
+    pushHistory(task, 'attention_requested', `Atenção solicitada por ${actorName()} para ${targets.join(', ')}.`);
+    task._etag = newEtag();
+    store.emit('taskUpdated', clone(task));
+    return clone(task);
   },
 };

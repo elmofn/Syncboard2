@@ -40,4 +40,13 @@ export const liveApi: ApiClient = {
 
   markNotificationRead: (id: string) =>
     req<void>('/api/markNotificationRead', { method: 'POST', body: JSON.stringify({ id }) }),
+
+  addComment: (taskId, payload) =>
+    req<Task>(`/api/addComment/${encodeURIComponent(taskId)}`, { method: 'POST', body: JSON.stringify(payload) }),
+
+  signalResponsible: (taskId, targets) =>
+    req<Task>(`/api/signalResponsible/${encodeURIComponent(taskId)}`, {
+      method: 'POST',
+      body: JSON.stringify({ targets }),
+    }),
 };
