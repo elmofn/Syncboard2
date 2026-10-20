@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, type CSSProperties } from 'react';
 import type { Task, TaskStatus } from '../types/api';
 import { BOARD_COLUMNS, STATUS_META } from '../lib/status';
 import { TaskCard } from './TaskCard';
@@ -38,7 +38,7 @@ export function Board({ tasks, moveTask, onOpen, notify }: Props) {
           <section
             key={status}
             className="board-column"
-            style={{ borderTop: `3px solid ${COLUMN_BORDER[status]}` }}
+            style={{ ['--col' as string]: COLUMN_BORDER[status] } as CSSProperties}
             onDragOver={(e) => e.preventDefault()}
             onDrop={() => onDrop(status)}
           >
