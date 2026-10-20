@@ -1,0 +1,25 @@
+{
+  "name": "syncboard-web",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Frontend do Syncboard (React + Vite + TypeScript). Reconstrução sobre o contrato de API existente.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@microsoft/signalr": "^8.0.7",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11"
+  }
+}

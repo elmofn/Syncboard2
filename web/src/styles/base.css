@@ -1,0 +1,194 @@
+/* Reset enxuto + primitivos de componente (valores verificados do pilot). */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html,
+body,
+#root {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: var(--sb-font);
+  font-size: var(--sb-fs-body);
+  line-height: 1.6;
+  color: var(--sb-text);
+  background: var(--sb-bg);
+  -webkit-font-smoothing: antialiased;
+}
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+h1 {
+  font-size: var(--sb-fs-title);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.035em;
+}
+h2 {
+  font-size: var(--sb-fs-subtitle);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+button {
+  font-family: inherit;
+}
+:focus-visible {
+  outline: var(--sb-focus-width) solid var(--sb-focus);
+  outline-offset: var(--sb-focus-offset);
+}
+
+/* Botão */
+.sb-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sb-sp-2);
+  padding: var(--sb-sp-2) var(--sb-sp-4);
+  border: 1px solid transparent;
+  border-radius: var(--sb-radius-control);
+  background: var(--sb-action);
+  color: var(--sb-on-action);
+  font-size: var(--sb-fs-control);
+  font-weight: 700;
+  cursor: pointer;
+  transition: filter var(--sb-motion) ease, background var(--sb-motion) ease;
+}
+.sb-button:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+.sb-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.sb-button--secondary {
+  background: var(--sb-panel);
+  color: var(--sb-text);
+  border-color: var(--sb-border-strong);
+}
+.sb-button--accent {
+  background: var(--sb-accent);
+  color: var(--sb-on-accent);
+}
+.sb-button--danger {
+  background: var(--sb-danger);
+  color: #fff;
+}
+.sb-button--ghost {
+  background: transparent;
+  color: var(--sb-text);
+  border-color: transparent;
+}
+
+/* Chip */
+.sb-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sb-sp-1);
+  padding: var(--sb-sp-1) var(--sb-sp-2);
+  border: 1px solid var(--sb-border-strong);
+  border-radius: var(--sb-radius-control);
+  background: var(--sb-status-todo-bg);
+  color: var(--sb-status-todo-fg);
+  font-size: var(--sb-fs-meta);
+  font-weight: 700;
+  cursor: pointer;
+}
+.sb-chip[aria-pressed="true"] {
+  background: var(--sb-ink);
+  color: var(--sb-accent);
+  border-color: var(--sb-ink);
+}
+
+/* Badge de status */
+.sb-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: var(--sb-sp-1) var(--sb-sp-2);
+  border-radius: var(--sb-radius-control);
+  font-size: var(--sb-fs-meta);
+  font-weight: 700;
+  line-height: 18px;
+  white-space: nowrap;
+}
+
+/* Painel / card */
+.sb-panel {
+  background: var(--sb-panel);
+  border: 1px solid var(--sb-panel-border);
+  border-radius: var(--sb-radius-panel);
+  padding: var(--sb-sp-5);
+}
+.sb-card {
+  background: var(--sb-panel);
+  border: 1px solid var(--sb-panel-border);
+  border-radius: var(--sb-radius-card);
+  padding: var(--sb-sp-4);
+}
+
+/* Avatar */
+.sb-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--sb-ink);
+  color: var(--sb-accent);
+  font-size: var(--sb-fs-control);
+  font-weight: 700;
+  flex: none;
+  overflow: hidden;
+}
+.sb-avatar--sm {
+  width: 28px;
+  height: 28px;
+  font-size: var(--sb-fs-meta);
+}
+.sb-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Campos */
+.sb-label {
+  font-size: var(--sb-fs-control);
+  font-weight: 700;
+  color: var(--sb-text);
+}
+.sb-input,
+.sb-textarea,
+.sb-select {
+  width: 100%;
+  padding: var(--sb-sp-3);
+  border: 1px solid var(--sb-border-strong);
+  border-radius: var(--sb-radius-control);
+  background: var(--sb-panel);
+  color: var(--sb-text);
+  font-size: var(--sb-fs-control);
+  font-family: inherit;
+}
+.sb-meta {
+  font-size: var(--sb-fs-meta);
+  color: var(--sb-text-muted);
+}
+
+/* Utilitários mínimos */
+.sb-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sb-sp-2);
+}
+.sb-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sb-sp-3);
+}

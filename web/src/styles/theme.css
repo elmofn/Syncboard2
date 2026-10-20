@@ -1,0 +1,77 @@
+/*
+ * Design System "Fluxo v2" — tokens.
+ * Fonte única de verdade do tema, derivada de app/assets/brand-v2/brand-tokens.json
+ * e dos estilos computados verificados (docs/DESIGN-SYSTEM.md).
+ * NENHUM valor foi portado de custom.css / *-v2.css.
+ */
+:root {
+  /* Marca */
+  --sb-ink: #111827;
+  --sb-accent: #d6f46a;
+  --sb-action: #244fdb;
+  --sb-surface: #f5f7fa;
+  --sb-muted: #526174;
+  --sb-border-strong: #7b8798;
+  --sb-focus: #244fdb;
+  --sb-danger: #a62a24;
+
+  /* Superfícies (tema claro) */
+  --sb-bg: var(--sb-surface);
+  --sb-panel: #ffffff;
+  --sb-panel-border: #dce2ea;
+  --sb-text: #111827;
+  --sb-text-muted: #526174;
+  --sb-on-accent: #111827;
+  --sb-on-action: #ffffff;
+
+  /* Tipografia */
+  --sb-font: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+  --sb-fs-title: 28px;
+  --sb-fs-subtitle: 20px;
+  --sb-fs-body: 16px;
+  --sb-fs-control: 14px;
+  --sb-fs-meta: 12px;
+
+  /* Espaçamento (4·8·12·16·24·32) */
+  --sb-sp-1: 4px;
+  --sb-sp-2: 8px;
+  --sb-sp-3: 12px;
+  --sb-sp-4: 16px;
+  --sb-sp-5: 24px;
+  --sb-sp-6: 32px;
+
+  /* Raios */
+  --sb-radius-control: 7px;
+  --sb-radius-card: 9px;
+  --sb-radius-panel: 12px;
+
+  /* Foco e movimento */
+  --sb-focus-width: 3px;
+  --sb-focus-offset: 3px;
+  --sb-motion: 120ms;
+
+  /* Status: fundo / texto */
+  --sb-status-todo-bg: #edf1f6;
+  --sb-status-todo-fg: #495a70;
+  --sb-status-stopped-bg: #fff1dd;
+  --sb-status-stopped-fg: #8c5000;
+  --sb-status-inprogress-bg: #eaf0ff;
+  --sb-status-inprogress-fg: #214cc8;
+  --sb-status-homologation-bg: #f2eafb;
+  --sb-status-homologation-fg: #713aa3;
+  --sb-status-publication-bg: #e4f3ed;
+  --sb-status-publication-fg: #17674d;
+  --sb-status-error-bg: #fff0ee;
+  --sb-status-error-fg: #a62a24;
+}
+
+/* Tema escuro — PROVISÓRIO (proposta não homologada, ver DESIGN-SYSTEM.md §1.2). */
+:root[data-theme="dark"] {
+  --sb-bg: #111827;
+  --sb-panel: #1b2536;
+  --sb-panel-border: #3b4a60;
+  --sb-text: #f5f7fa;
+  --sb-text-muted: #b5c1d0;
+  --sb-border-strong: #91a1b8;
+  --sb-danger: #ffb6ad;
+}
