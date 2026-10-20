@@ -1,0 +1,27 @@
+{
+  "wordmark": "SyncBOARD",
+  "viewBox": "0 0 413.617 96",
+  "source": "TC496, proposta aprovada por Felipe em 2026-10-14",
+  "primary_assets": {
+    "logo-primary-light.svg": "652ceb2c52e3bbfca343f831cac4c59e6769d5a61aefd8d860c4373fdf4d7b55",
+    "logo-primary-dark.svg": "365fc680e60741818f4cf88e2be6471666e34db121a120df69c6da848ed9eb0f"
+  },
+  "cube_geometry": {
+    "logo-primary-mono-light.svg": "d1591d17c7f75d1c0582e3618837f1c7160e2f2a5d8f9807b6a1c41506ae2962",
+    "mark-small-mono.svg": "87cc906086b0a578251fba7fe20bdae5f2a11d99bed585a94889c7af80ed39a7",
+    "logo-primary-light.svg": "e0c2397eca4ecd3c0e45c7229fcbef38ea38d6922f268a003e27ad224cdc2c72",
+    "mark-small.svg": "cb198c419698eb2d9140ce02386addf27373fbcc77fe0fa2ae5534a569659191",
+    "mark-primary-light.svg": "e0c2397eca4ecd3c0e45c7229fcbef38ea38d6922f268a003e27ad224cdc2c72",
+    "logo-primary-dark.svg": "e0c2397eca4ecd3c0e45c7229fcbef38ea38d6922f268a003e27ad224cdc2c72",
+    "logo-primary-mono-dark.svg": "5cf733639ee5593a23db3ab5b37b89d3941359e58c3d96592387599144ed057c",
+    "mark-primary-mono.svg": "d1591d17c7f75d1c0582e3618837f1c7160e2f2a5d8f9807b6a1c41506ae2962",
+    "mark-primary-mono-dark.svg": "5cf733639ee5593a23db3ab5b37b89d3941359e58c3d96592387599144ed057c",
+    "favicon.svg": "cb198c419698eb2d9140ce02386addf27373fbcc77fe0fa2ae5534a569659191",
+    "mark-small-mono-dark.svg": "12fa87cba3f8765b786a405166bb442a0e14309cfd045bf0c9731e3c7b557407",
+    "mark-primary.svg": "e0c2397eca4ecd3c0e45c7229fcbef38ea38d6922f268a003e27ad224cdc2c72"
+  },
+  "workspace_context": {
+    "index.html": "1d891bc9e0d3ff4830901848e862b84fb02431f0c67bc7e4e8b905b6d06097a7",
+    "ui-v2-fidelity-preview.html": "363861f98fc5cea2afa9433a1a665f2dcf04699e74266aec2499384575fee1cd"
+  }
+}

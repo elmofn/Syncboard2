@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<title>TC493 — fixture local de edição</title>
+<style>body{font:16px/1.6 sans-serif;padding:24px;background:#eef2f8;color:#172033}main{max-width:800px;margin:auto}#preview{white-space:pre-wrap;background:white;border:1px solid #94a3b8;padding:16px;border-radius:8px}#preview img{max-width:100%;height:auto}button{padding:12px;margin:6px}pre{white-space:pre-wrap;overflow-wrap:anywhere}/* TC493: multiline rich editing, isolated from the new-comment composer. */
+.sb-comment-edit {
+    box-sizing: border-box; width: min(640px, calc(100vw - 32px)); max-height: calc(100dvh - 32px);
+    margin: auto; padding: 24px; overflow-y: auto; border: 1px solid var(--sb-border-strong, #cbd5e1);
+    border-radius: 16px; background: var(--sb-surface, #fff); color: var(--sb-text, #172033);
+    font: 400 14px/1.6 var(--sb-font, sans-serif); box-shadow: 0 20px 60px rgb(0 0 0 / 25%);
+}
+.sb-comment-edit::backdrop { background: rgb(15 23 42 / 55%); }
+.sb-comment-edit h2 { margin: 0 0 8px; font-size: 22px; font-weight: 700; }
+.sb-comment-edit p { margin: 8px 0 12px; }
+.sb-comment-edit #comment-edit-help { color: var(--sb-muted, #526079); }
+.sb-comment-edit-content {
+    box-sizing: border-box; min-height: 200px; max-height: 50dvh; padding: 12px; overflow: auto;
+    border: 1px solid var(--sb-border-strong, #94a3b8); border-radius: 8px;
+    background: var(--sb-canvas, #f8fafc); color: inherit; white-space: pre-wrap; overflow-wrap: anywhere;
+}
+.sb-comment-edit-content:focus-visible, .sb-comment-edit button:focus-visible {
+    outline: 2px solid var(--sb-focus, #2563eb); outline-offset: 2px;
+}
+.sb-comment-edit-content img { max-width: 100%; height: auto; }
+.sb-comment-edit-content ul { list-style: disc; padding-left: 24px; }
+.sb-comment-edit-content ol { list-style: decimal; padding-left: 24px; }
+.sb-comment-edit-content .mention-tag { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
+.sb-comment-edit #comment-edit-feedback { min-height: 1.6em; color: var(--sb-muted, #526079); }
+.sb-comment-edit-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 12px; }
+.sb-comment-edit button { min-height: 44px; padding: 10px 16px; border: 1px solid var(--sb-border-strong, #cbd5e1); border-radius: 8px; font: inherit; cursor: pointer; background: var(--sb-surface, #fff); color: inherit; }
+.sb-comment-edit button[type='submit'] { background: var(--sb-action, #2563eb); color: #fff; border-color: var(--sb-action, #2563eb); }
+.sb-comment-edit button:disabled { opacity: .65; cursor: wait; }
+@media (max-width: 480px) { .sb-comment-edit { padding: 16px; } .sb-comment-edit-actions button { flex: 1 1 auto; } }
+
+</style>
+<body><main><h1>TC493: edição de comentário</h1>
+<p>Fixture sintética local. Não usa API, conta ou dados reais. O resultado permanece somente nesta página. Não é evidência de validação visual no produto.</p>
+<p><button id="plain">Carregar texto multilinha</button><button id="rich">Carregar texto formatado</button></p>
+<div id="preview"></div>
+<p><button id="baseline">Abrir prompt anterior</button><button id="edit">Editar com correção</button><label><input id="fail" type="checkbox"> Simular erro ao salvar</label></p>
+<p id="notice" role="status"></p><details><summary>Último conteúdo enviado à fixture</summary><pre id="payload"></pre></details>
+<script>// Comments already contain the rich HTML rendered in the task feed. Keep that
+// representation while editing, including line breaks, mentions and images.
+function openCommentEditor(originalText, onSave, onSaved = () => {}, restoreFocus) {
+    const existing = document.getElementById('comment-edit-dialog');
+    if (existing) { existing.querySelector('[contenteditable]')?.focus(); return true; }
+    const dialog = document.createElement('dialog');
+    if (typeof dialog.showModal !== 'function') return false;
+    const previousFocus = document.activeElement;
+    dialog.id = 'comment-edit-dialog';
+    dialog.className = 'sb-comment-edit';
+    dialog.setAttribute('aria-labelledby', 'comment-edit-title');
+    dialog.innerHTML = `<form>
+        <h2 id="comment-edit-title">Editar comentário</h2>
+        <p id="comment-edit-help">Enter cria uma linha. Use Salvar alterações para confirmar.</p>
+        <div id="comment-edit-content" class="sb-comment-edit-content" role="textbox" aria-label="Comentário" aria-multiline="true" aria-describedby="comment-edit-help comment-edit-feedback" contenteditable="true"></div>
+        <p id="comment-edit-feedback" role="status" aria-live="polite"></p>
+        <div class="sb-comment-edit-actions"><button type="button">Cancelar</button><button type="submit">Salvar alterações</button></div>
+    </form>`;
+    const editor = dialog.querySelector('[contenteditable]');
+    const form = dialog.querySelector('form');
+    const feedback = dialog.querySelector('[role="status"]');
+    const [cancel, save] = dialog.querySelectorAll('button');
+    editor.innerHTML = originalText;
+    // Browser HTML serialization can normalize quotes/entities without an edit.
+    const initialHTML = editor.innerHTML;
+    let busy = false;
+    cancel.addEventListener('click', () => { if (!busy) dialog.close(); });
+    dialog.addEventListener('cancel', event => { if (busy) event.preventDefault(); });
+    dialog.addEventListener('close', () => {
+        dialog.remove();
+        if (restoreFocus) restoreFocus();
+        else if (previousFocus?.isConnected) previousFocus.focus({ preventScroll: true });
+    }, { once: true });
+    // A plain Enter belongs to the editor, never to the form submission path.
+    editor.addEventListener('keydown', event => {
+        if (event.key === 'Enter' && (event.ctrlKey || event.metaKey) && !event.isComposing) {
+            event.preventDefault();
+            form.requestSubmit();
+        }
+    });
+    form.addEventListener('submit', async event => {
+        event.preventDefault();
+        if (busy) return;
+        const nextText = editor.innerHTML;
+        if (nextText === initialHTML) { dialog.close(); return; }
+        if (!editor.innerText.trim() && !editor.querySelector('img')) {
+            feedback.textContent = 'Comentário não pode ficar vazio.';
+            editor.focus();
+            return;
+        }
+        busy = true;
+        editor.contentEditable = 'false';
+        editor.setAttribute('aria-busy', 'true');
+        cancel.disabled = save.disabled = true;
+        feedback.textContent = 'Salvando…';
+        try {
+            await onSave(nextText);
+        } catch (error) {
+            feedback.textContent = error?.code === 'COMMENT_CHANGED'
+                ? 'O comentário mudou durante a edição. Copie seu rascunho e reabra o comentário atualizado antes de salvar.'
+                : error?.code === 'COMMENT_IDENTITY' || error?.status === 401
+                ? 'Sua sessão não está disponível. Copie seu rascunho e entre novamente antes de salvar.'
+                : error?.status === 403
+                ? 'A sessão atual não tem permissão para editar este comentário. Seu rascunho foi mantido.'
+                : error?.status === 404
+                ? 'O comentário ou a tarefa não está mais disponível. Seu rascunho foi mantido.'
+                : error?.status === 409
+                ? 'A tarefa mudou durante a gravação. Copie seu rascunho e reabra o comentário atualizado antes de salvar.'
+                : 'Não foi possível salvar. Seu texto foi mantido. Tente novamente.';
+            return;
+        } finally {
+            busy = false;
+            editor.contentEditable = 'true';
+            editor.removeAttribute('aria-busy');
+            cancel.disabled = save.disabled = false;
+        }
+        dialog.close();
+        // A rendering failure must not present a persisted edit as a failed save.
+        onSaved();
+    });
+    document.body.appendChild(dialog);
+    try { dialog.showModal(); editor.focus(); }
+    catch { dialog.remove(); return false; }
+    return true;
+}
+
+const plain = 'Registrando uma evidência:\n\nPrimeiro parágrafo.\nSegunda linha.\n\nÚltimo parágrafo.';
+const rich = '<p>Texto <strong>formatado</strong> com <em>ênfase</em>.</p><p><span class="mention-tag" contenteditable="false" data-email="ana@example.invalid" style="background:#dbeafe;border-radius:12px;padding:2px 8px">@Ana</span>&nbsp; mantém a identidade da menção.</p><ul><li>Primeiro item</li><li>Segundo item</li></ul><img alt="Imagem sintética de exemplo" width="240" height="80" src="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22240%22 height=%2280%22%3E%3Crect width=%22240%22 height=%2280%22 fill=%22%2393c5fd%22/%3E%3C/svg%3E">';
+let stored=plain;
+const preview=document.getElementById('preview'), notice=document.getElementById('notice'), payload=document.getElementById('payload');
+function show(){preview.innerHTML=stored;}
+document.getElementById('plain').onclick=()=>{stored=plain;show();};
+document.getElementById('rich').onclick=()=>{stored=rich;show();};
+document.getElementById('baseline').onclick=()=>{const next=window.prompt('Editar comentário:',stored);notice.textContent=next===null?'Prompt cancelado; nada salvo.':'Resultado retornado pelo prompt (somente fixture):';payload.textContent=JSON.stringify(next);};
+document.getElementById('edit').onclick=()=>openCommentEditor(stored,async next=>{await new Promise(r=>setTimeout(r,600));if(document.getElementById('fail').checked)throw Error('fixture');stored=next;payload.textContent=JSON.stringify(next);},()=>{show();notice.textContent='Comentário salvo somente na fixture.';});
+show();
+</script></main></body></html>
