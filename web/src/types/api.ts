@@ -104,6 +104,14 @@ export interface ProjectCount {
   total: number;
 }
 
+export interface UserInput {
+  email: string;
+  displayName: string;
+  role?: string;
+  isAdmin?: boolean;
+  isAiAgent?: boolean;
+}
+
 export interface ClientPrincipal {
   identityProvider: string;
   userId: string;

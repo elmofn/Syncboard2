@@ -1,5 +1,5 @@
 import type { ApiClient, TaskPatch } from './apiClient';
-import type { Task, User, Notification, CreateTaskPayload, ProjectCount, Attachment } from '../types/api';
+import type { Task, User, Notification, CreateTaskPayload, ProjectCount, Attachment, UserInput } from '../types/api';
 
 // Cliente real contra /api/* (ver docs/API.md). A autenticação é via cookie
 // do SWA (Google OAuth) — nenhum header de Authorization é necessário.
@@ -69,4 +69,13 @@ export const liveApi: ApiClient = {
     if (!res.ok) throw new Error((await res.text()) || 'Falha no upload.');
     return (await res.json()) as Attachment;
   },
+
+  addUser: (payload: UserInput) =>
+    req<User>('/api/addUser', { method: 'POST', body: JSON.stringify(payload) }),
+
+  updateUser: (id: string, payload: UserInput) =>
+    req<User>(`/api/updateUser/${encodeURIComponent(id)}`, { method: 'PUT', body: JSON.stringify(payload) }),
+
+  deleteUser: (id: string) =>
+    req<void>(`/api/deleteUser/${encodeURIComponent(id)}`, { method: 'DELETE' }),
 };

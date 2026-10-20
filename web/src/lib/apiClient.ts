@@ -1,4 +1,4 @@
-import type { Task, User, Notification, CreateTaskPayload, ProjectCount, Attachment } from '../types/api';
+import type { Task, User, Notification, CreateTaskPayload, ProjectCount, Attachment, UserInput } from '../types/api';
 
 /** Patch genérico de tarefa; aceita os auxiliares de concorrência do contrato. */
 export type TaskPatch = Partial<Task> & {
@@ -22,4 +22,7 @@ export interface ApiClient {
   signalResponsible(taskId: string, targets: string[]): Promise<Task>;
   improveTitle(currentTitle: string, userInstruction?: string): Promise<{ title: string }>;
   uploadAttachment(file: File): Promise<Attachment>;
+  addUser(payload: UserInput): Promise<User>;
+  updateUser(id: string, payload: UserInput): Promise<User>;
+  deleteUser(id: string): Promise<void>;
 }

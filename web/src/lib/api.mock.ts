@@ -1,5 +1,5 @@
 import type { ApiClient, TaskPatch } from './apiClient';
-import type { Task, CreateTaskPayload, Attachment, HistoryEntry } from '../types/api';
+import type { Task, CreateTaskPayload, Attachment, HistoryEntry, UserInput, User } from '../types/api';
 import { store } from './mock/store';
 import { mockCurrentPrincipal } from './mock/fixtures';
 
@@ -202,5 +202,42 @@ export const mockApi: ApiClient = {
       name: file.name,
       contentType: file.type || 'application/octet-stream',
     };
+  },
+
+  async addUser(payload: UserInput) {
+    await delay();
+    const email = payload.email.trim().toLowerCase();
+    if (store.users.some((u) => u.email.toLowerCase() === email)) throw new Error('Este utilizador já existe.');
+    const user: User = {
+      id: email,
+      email,
+      name: payload.displayName,
+      displayName: payload.displayName,
+      role: payload.role || '',
+      picture: '',
+      isAdmin: payload.isAdmin === true,
+      isAiAgent: payload.isAiAgent === true,
+    };
+    store.users.push(user);
+    return clone(user);
+  },
+
+  async updateUser(id: string, payload: UserInput) {
+    await delay();
+    const user = store.users.find((u) => u.id === id || u.email === id);
+    if (!user) throw new Error('Utilizador não encontrado.');
+    const newEmail = payload.email.trim().toLowerCase();
+    user.id = newEmail;
+    user.email = newEmail;
+    user.displayName = payload.displayName;
+    user.role = payload.role || '';
+    user.isAdmin = payload.isAdmin === true;
+    user.isAiAgent = payload.isAiAgent === true;
+    return clone(user);
+  },
+
+  async deleteUser(id: string) {
+    await delay();
+    store.users = store.users.filter((u) => u.id !== id && u.email !== id);
   },
 };

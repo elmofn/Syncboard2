@@ -74,7 +74,7 @@ export function Sidebar({ user, view, onNavigate, projects, activeCount, activeP
         <p className="sidebar__section-title">Configuração</p>
         <NavItem label="Workspace" onClick={() => undefined} muted />
         <NavItem label="Boards" onClick={() => undefined} muted />
-        <NavItem label="Users" onClick={() => undefined} muted />
+        <NavItem label="Users" active={view === 'pessoas'} onClick={() => onNavigate('pessoas')} />
       </nav>
 
       <div className="sidebar__user">

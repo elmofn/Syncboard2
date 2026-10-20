@@ -12,12 +12,14 @@ import { Board } from './Board';
 import { ListView } from './ListView';
 import { TaskDetail } from './TaskDetail';
 import { TaskForm } from './TaskForm';
+import { PeopleView } from './PeopleView';
 
 const HEADER: Record<View, { title: string; subtitle: string }> = {
   home: { title: 'Home', subtitle: 'Um resumo do seu trabalho.' },
   quadro: { title: 'Quadro de trabalho', subtitle: 'Da fila à publicação, com cada etapa à vista.' },
   lista: { title: 'Lista de tarefas', subtitle: 'Todas as tarefas ativas, organizadas em uma só visão.' },
   arquivados: { title: 'Arquivados', subtitle: 'Tarefas concluídas.' },
+  pessoas: { title: 'Pessoas', subtitle: 'Gerencie os usuários do workspace.' },
 };
 
 export function Workspace({ user }: { user: ClientPrincipal }) {
@@ -32,8 +34,10 @@ export function Workspace({ user }: { user: ClientPrincipal }) {
   const [openId, setOpenId] = useState<string | null>(null);
   const [form, setForm] = useState<{ mode: 'create' } | { mode: 'edit'; task: Task } | null>(null);
 
+  const reloadUsers = () => api.getUsers().then(setUsers).catch(() => undefined);
+
   useEffect(() => {
-    api.getUsers().then(setUsers).catch(() => undefined);
+    reloadUsers();
     api.getNotifications().then(setNotifications).catch(() => undefined);
   }, []);
 
@@ -132,6 +136,15 @@ export function Workspace({ user }: { user: ClientPrincipal }) {
           {view === 'quadro' && <Board tasks={filtered} moveTask={moveTask} onOpen={(t) => setOpenId(t.id)} notify={flash} />}
           {view === 'lista' && <ListView tasks={filtered} onOpen={(t) => setOpenId(t.id)} />}
           {view === 'arquivados' && <ListView tasks={archived ?? []} onOpen={(t) => setOpenId(t.id)} />}
+          {view === 'pessoas' && (
+            <PeopleView
+              users={users}
+              canManage={user.userRoles.includes('admin')}
+              currentEmail={user.userDetails}
+              onChanged={reloadUsers}
+              notify={flash}
+            />
+          )}
           {view === 'home' && <p className="sb-meta">Home chega em um próximo passo.</p>}
         </div>
       </div>
