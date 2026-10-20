@@ -1,5 +1,5 @@
 import type { ApiClient, TaskPatch } from './apiClient';
-import type { Task, User, Notification, CreateTaskPayload } from '../types/api';
+import type { Task, User, Notification, CreateTaskPayload, ProjectCount } from '../types/api';
 
 // Cliente real contra /api/* (ver docs/API.md). A autenticação é via cookie
 // do SWA (Google OAuth) — nenhum header de Authorization é necessário.
@@ -24,6 +24,7 @@ export const liveApi: ApiClient = {
   getArchivedTasks: () => req<Task[]>('/api/getArchivedTasks'),
   getUsers: () => req<User[]>(`/api/getUsers?t=${Date.now()}`),
   getNotifications: () => req<Notification[]>('/api/getNotifications', { cache: 'no-store' }),
+  getProjectTaskCounts: () => req<ProjectCount[]>('/api/getProjectTaskCounts'),
 
   createTask: (payload: CreateTaskPayload) =>
     req<Task>('/api/createTask', { method: 'POST', body: JSON.stringify(payload) }),

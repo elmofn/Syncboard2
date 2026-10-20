@@ -55,6 +55,7 @@ export interface Task {
   homologador?: PersonRef | null;
   status: TaskStatus;
   priority: string;
+  progress?: number; // 0–100 (barra "Progresso")
   project: string;
   projectColor: string;
   azureLink?: string;
@@ -93,6 +94,12 @@ export interface Notification {
   commentPreview?: string;
   isRead: boolean;
   createdAt: string;
+}
+
+export interface ProjectCount {
+  project: string;
+  active: number;
+  total: number;
 }
 
 export interface ClientPrincipal {

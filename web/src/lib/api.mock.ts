@@ -36,6 +36,19 @@ export const mockApi: ApiClient = {
     return clone(store.notifications);
   },
 
+  async getProjectTaskCounts() {
+    await delay();
+    const map = new Map<string, { project: string; active: number; total: number }>();
+    for (const t of store.tasks) {
+      if (!t.project) continue;
+      const e = map.get(t.project) ?? { project: t.project, active: 0, total: 0 };
+      e.total += 1;
+      if (t.status !== 'done') e.active += 1;
+      map.set(t.project, e);
+    }
+    return [...map.values()];
+  },
+
   async createTask(payload: CreateTaskPayload) {
     await delay();
     const numericId = Math.max(0, ...store.tasks.map((t) => t.numericId ?? 0)) + 1;

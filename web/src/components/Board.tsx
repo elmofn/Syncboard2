@@ -1,11 +1,24 @@
 import { useRef } from 'react';
-import type { TaskStatus } from '../types/api';
+import type { Task, TaskStatus } from '../types/api';
 import { BOARD_COLUMNS, STATUS_META } from '../lib/status';
-import { useTasks } from '../hooks/useTasks';
 import { TaskCard } from './TaskCard';
 
-export function Board() {
-  const { tasks, error, moveTask } = useTasks();
+interface Props {
+  tasks: Task[];
+  moveTask: (id: string, status: TaskStatus) => void;
+  onOpen?: (task: Task) => void;
+}
+
+const COLUMN_BORDER: Record<TaskStatus, string> = {
+  todo: 'var(--sb-border-strong)',
+  stopped: 'var(--sb-status-stopped-fg)',
+  inprogress: 'var(--sb-status-inprogress-fg)',
+  homologation: 'var(--sb-status-homologation-fg)',
+  publication: 'var(--sb-status-publication-fg)',
+  done: 'var(--sb-border-strong)',
+};
+
+export function Board({ tasks, moveTask, onOpen }: Props) {
   const draggedId = useRef<string | null>(null);
 
   const onDrop = (status: TaskStatus) => {
@@ -13,19 +26,6 @@ export function Board() {
     draggedId.current = null;
     if (id) moveTask(id, status);
   };
-
-  if (error) {
-    return (
-      <div className="sb-panel board-error" role="alert">
-        <strong>Não foi possível carregar.</strong>
-        <p className="sb-meta">{error}</p>
-      </div>
-    );
-  }
-
-  if (!tasks) {
-    return <div className="board-loading sb-meta">Carregando tarefas…</div>;
-  }
 
   return (
     <div className="board">
@@ -37,6 +37,7 @@ export function Board() {
           <section
             key={status}
             className="board-column"
+            style={{ borderTop: `3px solid ${COLUMN_BORDER[status]}` }}
             onDragOver={(e) => e.preventDefault()}
             onDrop={() => onDrop(status)}
           >
@@ -47,9 +48,14 @@ export function Board() {
             </header>
             <div className="board-column__list">
               {column.map((task) => (
-                <TaskCard key={task.id} task={task} onDragStart={(id) => (draggedId.current = id)} />
+                <TaskCard
+                  key={task.id}
+                  task={task}
+                  onDragStart={(id) => (draggedId.current = id)}
+                  onOpen={onOpen}
+                />
               ))}
-              {column.length === 0 && <p className="board-column__empty sb-meta">Sem tarefas</p>}
+              {column.length === 0 && <p className="board-column__empty sb-meta">Nenhuma tarefa nesta etapa.</p>}
             </div>
           </section>
         );

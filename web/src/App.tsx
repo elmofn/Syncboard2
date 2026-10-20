@@ -1,7 +1,6 @@
 import { useAuth } from './hooks/useAuth';
 import { Login } from './components/Login';
-import { AppShell } from './components/AppShell';
-import { Board } from './components/Board';
+import { Workspace } from './components/Workspace';
 
 export default function App() {
   const { user, loading } = useAuth();
@@ -16,9 +15,5 @@ export default function App() {
 
   if (!user) return <Login />;
 
-  return (
-    <AppShell user={user}>
-      <Board />
-    </AppShell>
-  );
+  return <Workspace user={user} />;
 }
