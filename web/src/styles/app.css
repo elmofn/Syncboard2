@@ -1034,3 +1034,93 @@
   border: none;
   cursor: pointer;
 }
+
+/* ---------- Fluxo de responsáveis ---------- */
+.flowmini {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+.flowmini__unknown {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--sb-status-inprogress-bg);
+  color: var(--sb-status-inprogress-fg);
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: var(--sb-fs-meta);
+  border: 1px dashed var(--sb-border-strong);
+  flex: none;
+}
+.flowmini__sep,
+.flowmini__arrow {
+  color: var(--sb-text-muted);
+}
+.flowmini__step {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.avatar-group {
+  display: inline-flex;
+  align-items: center;
+}
+.avatar-group > * + * {
+  margin-left: -8px;
+}
+.avatar-group .sb-avatar {
+  box-shadow: 0 0 0 2px var(--sb-panel);
+}
+.avatar-group__more {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--sb-panel-border);
+  color: var(--sb-text);
+  display: grid;
+  place-items: center;
+  font-size: var(--sb-fs-meta);
+  font-weight: 700;
+  box-shadow: 0 0 0 2px var(--sb-panel);
+}
+
+.flow__placeholder {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--sb-status-inprogress-bg);
+  color: var(--sb-status-inprogress-fg);
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: var(--sb-fs-meta);
+  flex: none;
+}
+.flow__note {
+  border-top: 1px dashed var(--sb-border-strong);
+  border-bottom: 1px dashed var(--sb-border-strong);
+  padding: var(--sb-sp-1) 0;
+}
+.flow__stepbox {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sb-sp-2);
+}
+.flow__stepbox.is-current {
+  background: color-mix(in srgb, var(--sb-action) 8%, var(--sb-panel));
+  border: 1px solid color-mix(in srgb, var(--sb-action) 30%, var(--sb-panel-border));
+  border-radius: var(--sb-radius-card);
+  padding: var(--sb-sp-2);
+}
+.flow__person {
+  display: flex;
+  gap: var(--sb-sp-2);
+  align-items: flex-start;
+}
+.flow__person div {
+  display: flex;
+  flex-direction: column;
+}

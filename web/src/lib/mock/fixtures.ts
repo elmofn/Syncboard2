@@ -35,6 +35,7 @@ export const mockTasks: Task[] = [
     id: 'TC-001', numericId: 1, title: 'Tela de login nova', description: 'Reconstruir o login no web/.',
     responsible: [P.ana], status: 'inprogress', priority: 'Alta', progress: 40, project: 'Frontend', projectColor: '#244FDB',
     order: -now, createdAt: iso(600), createdBy: 'Ana Souza', requester: P.ana, _etag: '"m1"',
+    assignmentHistory: [{ at: iso(300), actorEmail: 'ana@exemplo.com', from: [P.bia], to: [P.ana] }],
     comments: [{ id: 'c1', text: 'Comecei pelo layout split.', author: P.ana, timestamp: iso(120) }],
     history: [
       { action: 'created', description: 'Tarefa criada por <b>Ana Souza</b>', timestamp: iso(600) },
@@ -44,7 +45,11 @@ export const mockTasks: Task[] = [
   {
     id: 'TC-002', numericId: 2, title: 'Contrato da API', description: 'Documentar endpoints.',
     responsible: [P.ana, P.caio], status: 'publication', priority: 'Média', progress: 100, project: 'Docs', projectColor: '#17674D',
-    order: -now + 1000, createdAt: iso(800), createdBy: 'Ana Souza', _etag: '"m2"',
+    order: -now + 1000, createdAt: iso(800), createdBy: 'Ana Souza', requester: P.ana, _etag: '"m2"',
+    assignmentHistory: [
+      { at: iso(800), actorEmail: 'ana@exemplo.com', from: [], to: [P.ana] },
+      { at: iso(400), actorEmail: 'ana@exemplo.com', from: [P.ana], to: [P.ana, P.caio] },
+    ],
   },
   {
     id: 'TC-003', numericId: 3, title: 'Mapear acesso do agente', description: 'API direta para o DOT.',

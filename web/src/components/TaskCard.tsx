@@ -1,7 +1,7 @@
 import type { Task } from '../types/api';
-import { Avatar } from './Avatar';
 import { StatusBadge } from './StatusBadge';
 import { ProgressBar } from './ProgressBar';
+import { TaskFlowMini } from './TaskFlowMini';
 
 export function TaskCard({
   task,
@@ -12,7 +12,6 @@ export function TaskCard({
   onDragStart: (id: string) => void;
   onOpen?: (task: Task) => void;
 }) {
-  const responsibles = Array.isArray(task.responsible) ? task.responsible : [];
   const hasAlert = Array.isArray(task.pendingAlerts) && task.pendingAlerts.length > 0;
   const comments = Array.isArray(task.comments) ? task.comments.length : 0;
   return (
@@ -37,11 +36,7 @@ export function TaskCard({
       </div>
       {typeof task.progress === 'number' && <ProgressBar value={task.progress} label />}
       <div className="task-card__footer">
-        <div className="task-card__people">
-          {responsibles.slice(0, 4).map((p, i) => (
-            <Avatar key={i} person={p} small />
-          ))}
-        </div>
+        <TaskFlowMini task={task} />
         <span className="sb-meta">💬 {comments}</span>
       </div>
     </article>

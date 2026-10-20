@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import type { Task, User, ClientPrincipal, PersonRef } from '../types/api';
-import { personEmail, personName } from '../types/api';
+import { personName } from '../types/api';
 import { api } from '../lib/api';
+import { buildTaskFlow } from '../lib/flow';
 import { Avatar } from './Avatar';
 import { StatusBadge } from './StatusBadge';
 import { ProgressBar } from './ProgressBar';
@@ -93,7 +94,8 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify }
     void run(() => api.signalResponsible(task.id, targets), 'Falha ao chamar atenção.');
   };
 
-  const flow = buildFlow(task);
+  const flow = buildTaskFlow(task);
+  const alerts = Array.isArray(task.pendingAlerts) ? task.pendingAlerts : [];
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -232,19 +234,45 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify }
 
             <h2 className="summary__flow-title">Fluxo</h2>
             <ul className="flow">
-              {flow.map((f, i) => (
-                <li key={i} className="flow__item">
-                  <Avatar person={f.person} small />
-                  <div>
-                    <strong>{f.name}</strong>
-                    <div className="sb-meta">
-                      {f.role}
-                      {f.at ? ` · ${fmt(f.at)}` : ''}
-                    </div>
-                    {f.alert && <div className="flow__alert">• Atenção solicitada {fmt(f.alert)}</div>}
-                  </div>
-                </li>
-              ))}
+              <li className="flow__item">
+                {flow.requester ? <Avatar person={flow.requester} small /> : <span className="flow__placeholder">NR</span>}
+                <div>
+                  <strong>{flow.requester?.name || 'Não registrado'}</strong>
+                  <div className="sb-meta">Solicitante{flow.requester && task.createdAt ? ` · ${fmt(task.createdAt)}` : ''}</div>
+                </div>
+              </li>
+
+              {flow.partial && <li className="flow__note sb-meta">Histórico parcial: trocas anteriores não registradas</li>}
+
+              {flow.steps.map((step, idx) => {
+                const isLast = idx === flow.steps.length - 1;
+                return (
+                  <li key={idx} className={`flow__stepbox${isLast ? ' is-current' : ''}`}>
+                    {step.people.map((p, j) => {
+                      const role = isLast && j === 0 ? 'Responsável principal' : 'Responsável';
+                      const alert = alerts.find((a) => a.targetUser === p.name || a.targetUser === p.email);
+                      return (
+                        <div key={p.email || j} className="flow__person">
+                          <Avatar person={p} small />
+                          <div>
+                            <strong>{p.name}</strong>
+                            <div className="sb-meta">{role}{step.at ? ` · ${fmt(step.at)}` : ''}</div>
+                            {alert && <div className="flow__alert">• Atenção solicitada {fmt(alert.timestamp)}</div>}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </li>
+                );
+              })}
+
+              <li className="flow__item">
+                {flow.homologador ? <Avatar person={flow.homologador} small /> : <span className="flow__placeholder">NI</span>}
+                <div>
+                  <strong>{flow.homologador?.name || 'Não informado'}</strong>
+                  <div className="sb-meta">Homologador</div>
+                </div>
+              </li>
             </ul>
 
             <ProgressBar value={task.progress ?? 0} label />
@@ -288,33 +316,4 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify }
   );
 
   void currentUser; // reservado para restringir ações ao homologador designado (fase live)
-}
-
-interface FlowEntry {
-  name: string;
-  role: string;
-  person: PersonRef;
-  at?: string;
-  alert?: string;
-}
-
-function buildFlow(task: Task): FlowEntry[] {
-  const out: FlowEntry[] = [];
-  const requesterName = task.requester?.name || task.createdBy;
-  if (requesterName) {
-    out.push({ name: requesterName, role: 'Solicitante', at: task.createdAt, person: task.requester ?? { email: '', name: requesterName } });
-  }
-  const resp = Array.isArray(task.responsible) ? task.responsible : [];
-  const alerts = Array.isArray(task.pendingAlerts) ? task.pendingAlerts : [];
-  resp.forEach((r, i) => {
-    const name = personName(r);
-    const alert = alerts.find((a) => a.targetUser === name || a.targetUser === personEmail(r));
-    out.push({ name, role: i === 0 ? 'Responsável principal' : 'Responsável', person: r, alert: alert?.timestamp });
-  });
-  out.push({
-    name: personName(task.homologador) || 'Não informado',
-    role: 'Homologador',
-    person: task.homologador ?? { email: '', name: 'Não informado' },
-  });
-  return out;
 }

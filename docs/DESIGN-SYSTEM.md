@@ -165,6 +165,7 @@ Referência: `real-detalhe-historico.png`, `real-detalhe-homologacao.png`, `real
 - **"Marcar reunião"** sugere integração de **calendário** — reconcilia o escopo Google `auth/calendar` (que eu havia marcado como "não usado"); confirmar se cria evento (pode ser feature parcial/planejada).
 - **"Chamar atenção"** = `POST /api/signalResponsible/{id}`; o selo de alerta no card/fluxo = `pendingAlerts`.
 - Card/linha mostram **contagem de anexos** e **de comentários** (derivados dos arrays embutidos).
+- **Fluxo de responsáveis (card e Resumo):** derivado de `requester` + `assignmentHistory`. 1º = **Solicitante** (quem criou; ausente → "Não registrado"/NR). Depois a **cadeia de responsáveis** ao longo do tempo (cada passo = o conjunto de responsáveis daquele momento); troca de responsável vira uma **seta** para o próximo; responsáveis simultâneos aparecem **agrupados** (avatares sobrepostos). O passo atual é destacado e o primeiro dele é "Responsável principal". Quando há troca anterior ao primeiro registro (`assignmentHistory[0].from` não vazio), mostra "Histórico parcial: trocas anteriores não registradas". Por fim o **Homologador** (ausente → "Não informado"/NI). No card, o fluxo é compacto (solicitante … últimos passos com seta).
 
 ### 5.7 Ainda sem referência (opcional)
 Home, Pessoas (Users), Arquivados, painel de Notificações (conteúdo do sino) e os seletores de Workspace/Board abertos. Não bloqueiam o avanço; peço quando chegarmos nessas telas.
