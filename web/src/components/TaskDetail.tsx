@@ -14,6 +14,7 @@ interface Props {
   users: User[];
   currentUser: ClientPrincipal;
   onClose: () => void;
+  onEdit: () => void;
   notify: (msg: string) => void;
 }
 
@@ -34,7 +35,7 @@ const HISTORY_ICON: Record<string, string> = {
   edited: '✎',
 };
 
-export function TaskDetail({ task, users, currentUser, onClose, notify }: Props) {
+export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify }: Props) {
   const [tab, setTab] = useState<Tab>('comentarios');
   const [forwardOpen, setForwardOpen] = useState(false);
   const [forwardTo, setForwardTo] = useState('');
@@ -279,7 +280,7 @@ export function TaskDetail({ task, users, currentUser, onClose, notify }: Props)
           <span className="sb-meta">Alterações e comentários usam as ações desta tarefa.</span>
           <div className="sb-row">
             <button type="button" className="sb-button sb-button--secondary" onClick={onClose}>✕ Fechar</button>
-            <button type="button" className="sb-button" onClick={() => notify('Editar tarefa (formulário) chega no próximo passo.')}>✎ Editar tarefa</button>
+            <button type="button" className="sb-button" onClick={onEdit}>✎ Editar tarefa</button>
           </div>
         </footer>
       </div>

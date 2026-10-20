@@ -958,3 +958,79 @@
     border-top: 1px solid var(--sb-panel-border);
   }
 }
+
+/* ---------- Formulário de tarefa ---------- */
+.modal__chip--active {
+  background: color-mix(in srgb, var(--sb-action) 15%, var(--sb-panel));
+  color: var(--sb-action);
+}
+.form .field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.form .sb-label small {
+  font-weight: 400;
+}
+.ai-btn {
+  align-self: flex-start;
+}
+.form__desc {
+  min-height: 140px;
+  resize: vertical;
+}
+.form__attach-head,
+.form__prazo-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sb-sp-2);
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sb-sp-1);
+}
+.chip-person {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--sb-status-inprogress-bg);
+  color: var(--sb-status-inprogress-fg);
+  border-radius: var(--sb-radius-control);
+  padding: 4px 8px;
+  font-size: var(--sb-fs-control);
+  font-weight: 700;
+}
+.chip-person button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  font-size: 12px;
+}
+.form__project {
+  display: flex;
+  gap: var(--sb-sp-2);
+  align-items: center;
+}
+.form__color {
+  width: 44px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid var(--sb-border-strong);
+  border-radius: var(--sb-radius-control);
+  background: var(--sb-panel);
+  cursor: pointer;
+  flex: none;
+}
+.form__nodate {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.attachment__del {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}

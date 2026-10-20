@@ -11,6 +11,7 @@ import { FilterBar } from './FilterBar';
 import { Board } from './Board';
 import { ListView } from './ListView';
 import { TaskDetail } from './TaskDetail';
+import { TaskForm } from './TaskForm';
 
 const HEADER: Record<View, { title: string; subtitle: string }> = {
   home: { title: 'Home', subtitle: 'Um resumo do seu trabalho.' },
@@ -29,6 +30,7 @@ export function Workspace({ user }: { user: ClientPrincipal }) {
   const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS);
   const [notice, setNotice] = useState<string | null>(null);
   const [openId, setOpenId] = useState<string | null>(null);
+  const [form, setForm] = useState<{ mode: 'create' } | { mode: 'edit'; task: Task } | null>(null);
 
   useEffect(() => {
     api.getUsers().then(setUsers).catch(() => undefined);
@@ -86,7 +88,7 @@ export function Workspace({ user }: { user: ClientPrincipal }) {
           <WorkHeader
             title={header.title}
             subtitle={header.subtitle}
-            onNewTask={showFilters ? () => flash('Criação de tarefa chega no próximo passo (1f).') : undefined}
+            onNewTask={showFilters ? () => setForm({ mode: 'create' }) : undefined}
           />
 
           {notice && <div className="workspace__notice">{notice}</div>}
@@ -140,6 +142,20 @@ export function Workspace({ user }: { user: ClientPrincipal }) {
           users={users}
           currentUser={user}
           onClose={() => setOpenId(null)}
+          onEdit={() => {
+            setForm({ mode: 'edit', task: openTask });
+            setOpenId(null);
+          }}
+          notify={flash}
+        />
+      )}
+
+      {form && (
+        <TaskForm
+          mode={form.mode}
+          task={form.mode === 'edit' ? form.task : undefined}
+          users={users}
+          onClose={() => setForm(null)}
           notify={flash}
         />
       )}

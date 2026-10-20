@@ -188,4 +188,19 @@ export const mockApi: ApiClient = {
     store.emit('taskUpdated', clone(task));
     return clone(task);
   },
+
+  async improveTitle(currentTitle: string) {
+    await delay(300);
+    const clean = currentTitle.trim().replace(/\s+/g, ' ');
+    return { title: clean ? `${clean[0].toUpperCase()}${clean.slice(1)} — versão clara (mock)` : clean };
+  },
+
+  async uploadAttachment(file: File) {
+    await delay(200);
+    return {
+      url: `https://mock.local/${encodeURIComponent(file.name)}`,
+      name: file.name,
+      contentType: file.type || 'application/octet-stream',
+    };
+  },
 };

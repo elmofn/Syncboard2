@@ -20,4 +20,6 @@ export interface ApiClient {
   markNotificationRead(id: string): Promise<void>;
   addComment(taskId: string, payload: { text: string; attachments?: Attachment[] }): Promise<Task>;
   signalResponsible(taskId: string, targets: string[]): Promise<Task>;
+  improveTitle(currentTitle: string, userInstruction?: string): Promise<{ title: string }>;
+  uploadAttachment(file: File): Promise<Attachment>;
 }
