@@ -13,16 +13,17 @@ interface Props {
   activeCount: number;
   activeProject: string;
   onSelectProject: (project: string) => void;
+  open?: boolean;
 }
 
 function userName(user: ClientPrincipal): string {
   return user.claims?.find((c) => c.typ === 'name')?.val || user.userDetails;
 }
 
-export function Sidebar({ user, view, onNavigate, projects, activeCount, activeProject, onSelectProject }: Props) {
+export function Sidebar({ user, view, onNavigate, projects, activeCount, activeProject, onSelectProject, open }: Props) {
   const name = userName(user);
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar${open ? ' is-open' : ''}`}>
       <div className="sidebar__brand">
         <img src="/brand/mark-primary.svg" alt="" width={28} height={28} />
         <strong>SyncBOARD</strong>

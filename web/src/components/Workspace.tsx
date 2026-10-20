@@ -34,6 +34,11 @@ export function Workspace({ user }: { user: ClientPrincipal }) {
   const [notice, setNotice] = useState<string | null>(null);
   const [openId, setOpenId] = useState<string | null>(null);
   const [form, setForm] = useState<{ mode: 'create' } | { mode: 'edit'; task: Task } | null>(null);
+  const [navOpen, setNavOpen] = useState(false);
+  const go = (v: View) => {
+    setView(v);
+    setNavOpen(false);
+  };
 
   const reloadUsers = () => api.getUsers().then(setUsers).catch(() => undefined);
 
@@ -94,15 +99,18 @@ export function Workspace({ user }: { user: ClientPrincipal }) {
       <Sidebar
         user={user}
         view={view}
-        onNavigate={setView}
+        onNavigate={go}
+        open={navOpen}
         projects={projects}
         activeCount={activeTasks.length}
         activeProject={filters.project}
         onSelectProject={(project) => {
           setFilters((f) => ({ ...f, project }));
           if (view !== 'quadro' && view !== 'lista') setView('quadro');
+          setNavOpen(false);
         }}
       />
+      {navOpen && <div className="sidebar-backdrop" onClick={() => setNavOpen(false)} />}
 
       <div className="workspace__main">
         <TopBar
@@ -111,6 +119,7 @@ export function Workspace({ user }: { user: ClientPrincipal }) {
           notifications={notifications}
           onMarkRead={markNotification}
           onOpenTask={(taskId) => setOpenId(taskId)}
+          onToggleSidebar={() => setNavOpen((v) => !v)}
         />
 
         <div className="workspace__content">
@@ -158,9 +167,10 @@ export function Workspace({ user }: { user: ClientPrincipal }) {
 
           {error && <div className="workspace__notice workspace__notice--error">{error}</div>}
 
-          {view === 'quadro' && <Board tasks={filtered} moveTask={moveTask} reorderTask={reorderTask} onOpen={(t) => setOpenId(t.id)} notify={flash} />}
-          {view === 'lista' && <ListView tasks={filtered} onOpen={(t) => setOpenId(t.id)} />}
-          {view === 'arquivados' && <ListView tasks={archived ?? []} onOpen={(t) => setOpenId(t.id)} />}
+          {view === 'quadro' &&
+            (tasks === null ? <LoadingBox /> : <Board tasks={filtered} moveTask={moveTask} reorderTask={reorderTask} onOpen={(t) => setOpenId(t.id)} notify={flash} />)}
+          {view === 'lista' && (tasks === null ? <LoadingBox /> : <ListView tasks={filtered} onOpen={(t) => setOpenId(t.id)} />)}
+          {view === 'arquivados' && (archived === null ? <LoadingBox /> : <ListView tasks={archived} onOpen={(t) => setOpenId(t.id)} />)}
           {view === 'pessoas' && (
             <PeopleView
               users={users}
@@ -170,9 +180,7 @@ export function Workspace({ user }: { user: ClientPrincipal }) {
               notify={flash}
             />
           )}
-          {view === 'home' && (
-            <HomeView tasks={activeTasks} user={user} onOpen={(t) => setOpenId(t.id)} onGoHomologacao={goHomologacao} />
-          )}
+          {view === 'home' && (tasks === null ? <LoadingBox /> : <HomeView tasks={activeTasks} user={user} onOpen={(t) => setOpenId(t.id)} onGoHomologacao={goHomologacao} />)}
         </div>
       </div>
 
@@ -199,6 +207,14 @@ export function Workspace({ user }: { user: ClientPrincipal }) {
           notify={flash}
         />
       )}
+    </div>
+  );
+}
+
+function LoadingBox() {
+  return (
+    <div className="loading-box sb-meta">
+      <span className="spinner" aria-hidden="true" /> Carregando…
     </div>
   );
 }

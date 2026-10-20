@@ -10,9 +10,10 @@ interface Props {
   notifications: Notification[];
   onMarkRead: (id: string) => void;
   onOpenTask: (taskId: string) => void;
+  onToggleSidebar: () => void;
 }
 
-export function TopBar({ user, crumb, notifications, onMarkRead, onOpenTask }: Props) {
+export function TopBar({ user, crumb, notifications, onMarkRead, onOpenTask, onToggleSidebar }: Props) {
   const name = user.claims?.find((c) => c.typ === 'name')?.val || user.userDetails;
   const unread = notifications.filter((n) => !n.isRead).length;
   const [open, setOpen] = useState(false);
@@ -29,6 +30,7 @@ export function TopBar({ user, crumb, notifications, onMarkRead, onOpenTask }: P
 
   return (
     <div className="topbar">
+      <button type="button" className="topbar__burger" aria-label="Menu" onClick={onToggleSidebar}>☰</button>
       <nav className="topbar__crumb sb-meta" aria-label="Trilha">
         <span>Espaço de trabalho</span>
         <span aria-hidden="true">/</span>
