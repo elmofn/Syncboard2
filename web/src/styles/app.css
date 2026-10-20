@@ -184,7 +184,7 @@
   cursor: grab;
   display: flex;
   flex-direction: column;
-  gap: var(--sb-sp-2);
+  gap: var(--sb-sp-3);
 }
 .task-card:active {
   cursor: grabbing;
@@ -193,36 +193,109 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: var(--sb-sp-2);
+}
+.task-card__id {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.task-card__top-right {
+  display: flex;
+  align-items: center;
+  gap: var(--sb-sp-2);
 }
 .task-card__title {
   font-size: var(--sb-fs-control);
   font-weight: 700;
   line-height: 1.3;
 }
-.task-card__meta,
+.task-card__project {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  background: var(--sb-status-todo-bg);
+  color: var(--sb-text);
+  border-radius: var(--sb-radius-control);
+  padding: 2px 8px;
+  font-size: var(--sb-fs-meta);
+  font-weight: 700;
+}
+.task-card__project-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--sb-muted);
+}
 .task-card__footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--sb-sp-2);
-  flex-wrap: wrap;
-}
-.task-card__people {
-  display: flex;
-}
-.task-card__people > * + * {
-  margin-left: -8px;
 }
 .task-card__alert {
   display: inline-grid;
   place-items: center;
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   background: var(--sb-status-error-bg);
   color: var(--sb-status-error-fg);
   font-weight: 700;
-  font-size: var(--sb-fs-meta);
+  font-size: 11px;
+}
+
+/* menu do card (⋯) */
+.card-menu {
+  position: relative;
+}
+.card-menu__btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--sb-text-muted);
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+.card-menu__btn:hover {
+  background: var(--sb-panel-border);
+}
+.card-menu__list {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  background: var(--sb-panel);
+  border: 1px solid var(--sb-panel-border);
+  border-radius: var(--sb-radius-card);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+  z-index: 20;
+}
+.card-menu__list button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: none;
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--sb-fs-control);
+  color: var(--sb-text);
+}
+.card-menu__list button:hover {
+  background: color-mix(in srgb, var(--sb-panel) 85%, var(--sb-action));
+}
+.card-menu__list button.is-danger {
+  color: var(--sb-status-error-fg);
 }
 
 /* ---------- Responsivo ---------- */

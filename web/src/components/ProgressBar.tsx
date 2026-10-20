@@ -1,10 +1,10 @@
-export function ProgressBar({ value, label }: { value: number; label?: boolean }) {
+export function ProgressBar({ value, label, labelText }: { value: number; label?: boolean; labelText?: string }) {
   const pct = Math.max(0, Math.min(100, Math.round(value)));
   return (
     <div className="progress">
       {label && (
         <div className="progress__head sb-meta">
-          <span>Progresso</span>
+          <span>{labelText ?? 'Progresso'}</span>
           <span>{pct}%</span>
         </div>
       )}

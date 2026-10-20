@@ -129,7 +129,7 @@ export function Workspace({ user }: { user: ClientPrincipal }) {
 
           {error && <div className="workspace__notice workspace__notice--error">{error}</div>}
 
-          {view === 'quadro' && <Board tasks={filtered} moveTask={moveTask} onOpen={(t) => setOpenId(t.id)} />}
+          {view === 'quadro' && <Board tasks={filtered} moveTask={moveTask} onOpen={(t) => setOpenId(t.id)} notify={flash} />}
           {view === 'lista' && <ListView tasks={filtered} onOpen={(t) => setOpenId(t.id)} />}
           {view === 'arquivados' && <ListView tasks={archived ?? []} onOpen={(t) => setOpenId(t.id)} />}
           {view === 'home' && <p className="sb-meta">Home chega em um próximo passo.</p>}

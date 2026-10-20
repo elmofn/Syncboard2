@@ -7,6 +7,7 @@ interface Props {
   tasks: Task[];
   moveTask: (id: string, status: TaskStatus) => void;
   onOpen?: (task: Task) => void;
+  notify?: (msg: string) => void;
 }
 
 const COLUMN_BORDER: Record<TaskStatus, string> = {
@@ -18,7 +19,7 @@ const COLUMN_BORDER: Record<TaskStatus, string> = {
   done: 'var(--sb-border-strong)',
 };
 
-export function Board({ tasks, moveTask, onOpen }: Props) {
+export function Board({ tasks, moveTask, onOpen, notify }: Props) {
   const draggedId = useRef<string | null>(null);
 
   const onDrop = (status: TaskStatus) => {
@@ -53,6 +54,7 @@ export function Board({ tasks, moveTask, onOpen }: Props) {
                   task={task}
                   onDragStart={(id) => (draggedId.current = id)}
                   onOpen={onOpen}
+                  notify={notify}
                 />
               ))}
               {column.length === 0 && <p className="board-column__empty sb-meta">Nenhuma tarefa nesta etapa.</p>}
