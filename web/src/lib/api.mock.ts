@@ -189,6 +189,53 @@ export const mockApi: ApiClient = {
     return clone(task);
   },
 
+  async editComment(taskId: string, commentId: string, text: string, authorEmail: string) {
+    await delay();
+    const task = store.tasks.find((t) => t.id === taskId);
+    if (!task) throw new Error('Tarefa não encontrada.');
+    const comment = (Array.isArray(task.comments) ? task.comments : []).find((c) => c.id === commentId);
+    if (!comment) throw new Error('Comentário não encontrado.');
+    const authorName = typeof comment.author === 'object' ? comment.author.name : comment.author;
+    const authorMail = typeof comment.author === 'object' ? comment.author.email : '';
+    const a = authorEmail.toLowerCase();
+    if (![authorMail, authorName].filter(Boolean).map((v) => v!.toLowerCase()).includes(a)) {
+      throw new Error('Sem permissão para editar este comentário.');
+    }
+    comment.text = text;
+    comment.editedAt = new Date().toISOString();
+    task._etag = newEtag();
+    store.emit('taskUpdated', clone(task));
+    return clone(task);
+  },
+
+  async deleteComment(taskId: string, index: number) {
+    await delay();
+    const task = store.tasks.find((t) => t.id === taskId);
+    if (!task) throw new Error('Tarefa não encontrada.');
+    if (!Array.isArray(task.comments) || !task.comments[index]) throw new Error('Comentário não encontrado.');
+    task.comments.splice(index, 1);
+    task._etag = newEtag();
+    store.emit('taskUpdated', clone(task));
+    return clone(task);
+  },
+
+  async dismissAlert(taskId: string) {
+    await delay();
+    const task = store.tasks.find((t) => t.id === taskId);
+    if (!task) throw new Error('Tarefa não encontrada.');
+    const me = mockCurrentPrincipal.userDetails.toLowerCase();
+    const myName = actorName();
+    const at = new Date().toISOString();
+    task.pendingAlerts = (Array.isArray(task.pendingAlerts) ? task.pendingAlerts : []).map((alert) =>
+      (alert.targetUser === myName || alert.targetUser.toLowerCase() === me) && !alert.acknowledgedAt
+        ? { ...alert, acknowledgedAt: at }
+        : alert,
+    );
+    task._etag = newEtag();
+    store.emit('taskUpdated', clone(task));
+    return clone(task);
+  },
+
   async improveTitle(currentTitle: string) {
     await delay(300);
     const clean = currentTitle.trim().replace(/\s+/g, ' ');

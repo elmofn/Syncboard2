@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import type { Task, User, ClientPrincipal, PersonRef } from '../types/api';
+import { useRef, useState } from 'react';
+import type { Task, User, ClientPrincipal, PersonRef, Attachment } from '../types/api';
 import { personName } from '../types/api';
 import { api } from '../lib/api';
 import { buildTaskFlow } from '../lib/flow';
@@ -42,12 +42,28 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify }
   const [forwardTo, setForwardTo] = useState('');
   const [forwardNote, setForwardNote] = useState('');
   const [busy, setBusy] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const editRef = useRef<HTMLDivElement>(null);
+  const [attnOpen, setAttnOpen] = useState(false);
+  const [attnTargets, setAttnTargets] = useState<string[]>([]);
+  const attachRef = useRef<HTMLInputElement>(null);
 
   const responsibles = Array.isArray(task.responsible) ? task.responsible : [];
   const comments = Array.isArray(task.comments) ? task.comments : [];
   const attachments = Array.isArray(task.attachments) ? task.attachments : [];
   const history = Array.isArray(task.history) ? [...task.history].reverse() : [];
   const isHomolog = task.status === 'homologation';
+
+  const myEmail = currentUser.userDetails.toLowerCase();
+  const myName = currentUser.claims?.find((c) => c.typ === 'name')?.val || currentUser.userDetails;
+  const myAlert = (Array.isArray(task.pendingAlerts) ? task.pendingAlerts : []).find(
+    (a) => (a.targetUser === myName || a.targetUser.toLowerCase() === myEmail) && !a.acknowledgedAt,
+  );
+  const canEditComment = (author: PersonRef) => {
+    const email = (typeof author === 'object' ? author.email : '').toLowerCase();
+    const name = typeof author === 'object' ? author.name : author;
+    return email === myEmail || name === myName;
+  };
 
   const run = async (fn: () => Promise<unknown>, errMsg: string) => {
     setBusy(true);
@@ -85,13 +101,67 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify }
     }, 'Falha ao encaminhar.');
   };
 
-  const chamarAtencao = () => {
-    const targets = responsibles.map(personName).filter(Boolean);
-    if (targets.length === 0) {
+  const toggleAttn = () => {
+    const names = responsibles.map(personName).filter(Boolean);
+    if (names.length === 0) {
       notify('Não há responsáveis para sinalizar.');
       return;
     }
-    void run(() => api.signalResponsible(task.id, targets), 'Falha ao chamar atenção.');
+    setAttnTargets(names);
+    setAttnOpen((v) => !v);
+  };
+  const confirmAttn = () => {
+    if (attnTargets.length === 0) {
+      notify('Selecione ao menos um responsável.');
+      return;
+    }
+    void run(async () => {
+      await api.signalResponsible(task.id, attnTargets);
+      setAttnOpen(false);
+    }, 'Falha ao chamar atenção.');
+  };
+
+  const dismiss = () => run(() => api.dismissAlert(task.id, task._etag), 'Falha ao confirmar.');
+
+  const saveEditComment = (commentId: string, authorEmail: string) => {
+    const html = editRef.current?.innerHTML.trim() ?? '';
+    const text = editRef.current?.textContent?.trim() ?? '';
+    if (!text) {
+      notify('O comentário não pode ficar vazio.');
+      return;
+    }
+    void run(async () => {
+      await api.editComment(task.id, commentId, html, authorEmail);
+      setEditingId(null);
+    }, 'Falha ao editar o comentário.');
+  };
+  const deleteCommentAt = (index: number) => {
+    if (!window.confirm('Excluir este comentário?')) return;
+    void run(() => api.deleteComment(task.id, index), 'Falha ao excluir o comentário.');
+  };
+
+  const addTaskAttachments = async (files: FileList | null) => {
+    if (!files) return;
+    const uploaded: Attachment[] = [];
+    for (const file of Array.from(files)) {
+      try {
+        uploaded.push(await api.uploadAttachment(file));
+      } catch {
+        notify(`Falha ao anexar ${file.name}.`);
+      }
+    }
+    if (attachRef.current) attachRef.current.value = '';
+    if (uploaded.length === 0) return;
+    void run(
+      () => api.updateTask(task.id, { attachments: [...attachments, ...uploaded], expectedStatus: task.status, expectedEtag: task._etag }),
+      'Falha ao salvar anexos.',
+    );
+  };
+  const removeTaskAttachment = (index: number) => {
+    void run(
+      () => api.updateTask(task.id, { attachments: attachments.filter((_, i) => i !== index), expectedStatus: task.status, expectedEtag: task._etag }),
+      'Falha ao remover o anexo.',
+    );
   };
 
   const flow = buildTaskFlow(task);
@@ -153,27 +223,75 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify }
                   <p className="empty-box sb-meta">Nenhum comentário ainda. Use o campo abaixo para começar.</p>
                 ) : (
                   <ul className="comments">
-                    {comments.map((c) => (
-                      <li key={c.id} className="comment">
-                        <Avatar person={typeof c.author === 'object' ? c.author : { email: '', name: String(c.author) }} small />
-                        <div>
-                          <div className="comment__meta sb-meta">
-                            <strong>{personName(c.author as PersonRef)}</strong> · {fmt(c.timestamp)}
-                            {c.editedAt && ' (editado)'}
+                    {comments.map((c, i) => {
+                      const editable = canEditComment(c.author as PersonRef);
+                      const isEditing = editingId === c.id;
+                      const cAtts = Array.isArray(c.attachments) ? c.attachments : [];
+                      return (
+                        <li key={c.id} className="comment">
+                          <Avatar person={typeof c.author === 'object' ? c.author : { email: '', name: String(c.author) }} small />
+                          <div className="comment__main">
+                            <div className="comment__meta sb-meta">
+                              <strong>{personName(c.author as PersonRef)}</strong> · {fmt(c.timestamp)}
+                              {c.editedAt && ' (editado)'}
+                            </div>
+                            {isEditing ? (
+                              <div className="comment__edit">
+                                <div
+                                  key={`edit-${c.id}`}
+                                  ref={editRef}
+                                  className="editor__area comment__editarea"
+                                  contentEditable
+                                  role="textbox"
+                                  aria-multiline="true"
+                                  suppressContentEditableWarning
+                                  dangerouslySetInnerHTML={{ __html: c.text }}
+                                />
+                                <div className="sb-row">
+                                  <button type="button" className="sb-button" disabled={busy} onClick={() => saveEditComment(c.id, myEmail)}>Salvar</button>
+                                  <button type="button" className="sb-button sb-button--secondary" onClick={() => setEditingId(null)}>Cancelar</button>
+                                </div>
+                              </div>
+                            ) : (
+                              <>
+                                <Html className="comment__text" html={c.text} />
+                                {cAtts.length > 0 && (
+                                  <div className="comment__atts">
+                                    {cAtts.map((a, j) => (
+                                      <a key={j} className="editor__attach-chip" href={a.url} target="_blank" rel="noreferrer">📄 {a.name}</a>
+                                    ))}
+                                  </div>
+                                )}
+                                {editable && (
+                                  <div className="comment__actions">
+                                    <button type="button" onClick={() => setEditingId(c.id)}>Editar</button>
+                                    <button type="button" className="is-danger" onClick={() => deleteCommentAt(i)}>Excluir</button>
+                                  </div>
+                                )}
+                              </>
+                            )}
                           </div>
-                          <Html className="comment__text" html={c.text} />
-                        </div>
-                      </li>
-                    ))}
+                        </li>
+                      );
+                    })}
                   </ul>
                 )}
-                <CommentEditor onSubmit={(html) => run(() => api.addComment(task.id, { text: html }), 'Falha ao comentar.')} />
+                <CommentEditor
+                  users={users}
+                  notify={notify}
+                  onSubmit={(html, atts) => run(() => api.addComment(task.id, { text: html, attachments: atts.length ? atts : undefined }), 'Falha ao comentar.')}
+                />
                 <p className="sb-meta">Enter envia; Shift + Enter cria uma linha. Use @ para mencionar.</p>
               </div>
             )}
 
             {tab === 'anexos' && (
               <div className="tab-panel">
+                <div className="form__attach-head">
+                  <span className="sb-meta">{attachments.length} anexo(s) na tarefa</span>
+                  <button type="button" className="sb-button sb-button--secondary" disabled={busy} onClick={() => attachRef.current?.click()}>+ Adicionar</button>
+                  <input ref={attachRef} type="file" multiple hidden onChange={(e) => addTaskAttachments(e.target.files)} />
+                </div>
                 {attachments.length === 0 ? (
                   <p className="empty-box sb-meta">Nenhum anexo.</p>
                 ) : (
@@ -186,6 +304,7 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify }
                           <small className="sb-meta">Vinculado à tarefa</small>
                         </div>
                         <a className="attachment__view" href={a.url} target="_blank" rel="noreferrer" aria-label="Abrir anexo">👁</a>
+                        <button type="button" className="attachment__del" disabled={busy} onClick={() => removeTaskAttachment(i)} aria-label="Remover anexo">🗑</button>
                       </li>
                     ))}
                   </ul>
@@ -297,7 +416,30 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify }
                   )}
                 </>
               ) : (
-                <button type="button" className="sb-button sb-button--secondary" disabled={busy} onClick={chamarAtencao}>📣 Chamar atenção</button>
+                <>
+                  <button type="button" className="sb-button sb-button--secondary" disabled={busy} onClick={toggleAttn}>📣 Chamar atenção</button>
+                  {attnOpen && (
+                    <div className="forward-form">
+                      {responsibles.map((r) => {
+                        const nm = personName(r);
+                        return (
+                          <label key={nm} className="checkline">
+                            <input
+                              type="checkbox"
+                              checked={attnTargets.includes(nm)}
+                              onChange={(e) => setAttnTargets((prev) => (e.target.checked ? [...prev, nm] : prev.filter((x) => x !== nm)))}
+                            />{' '}
+                            {nm}
+                          </label>
+                        );
+                      })}
+                      <button type="button" className="sb-button" disabled={busy} onClick={confirmAttn}>Sinalizar</button>
+                    </div>
+                  )}
+                </>
+              )}
+              {myAlert && (
+                <button type="button" className="sb-button" disabled={busy} onClick={dismiss}>👀 Vou olhar</button>
               )}
               <button type="button" className="sb-button sb-button--secondary" onClick={() => notify('Marcar reunião: integração de calendário chega num próximo passo.')}>📅 Marcar reunião</button>
             </div>

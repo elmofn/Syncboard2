@@ -44,10 +44,28 @@ export const liveApi: ApiClient = {
   addComment: (taskId, payload) =>
     req<Task>(`/api/addComment/${encodeURIComponent(taskId)}`, { method: 'POST', body: JSON.stringify(payload) }),
 
+  editComment: (taskId, commentId, text, authorEmail) =>
+    req<Task>(`/api/tasks/${encodeURIComponent(taskId)}/comments/${encodeURIComponent(commentId)}`, {
+      method: 'PUT',
+      body: JSON.stringify({ text, author: authorEmail }),
+    }),
+
+  deleteComment: (taskId, index) =>
+    req<Task>(`/api/deleteComment/${encodeURIComponent(taskId)}`, {
+      method: 'DELETE',
+      body: JSON.stringify({ index }),
+    }),
+
   signalResponsible: (taskId, targets) =>
     req<Task>(`/api/signalResponsible/${encodeURIComponent(taskId)}`, {
       method: 'POST',
       body: JSON.stringify({ targets }),
+    }),
+
+  dismissAlert: (taskId, expectedEtag) =>
+    req<Task>(`/api/dismissAlert/${encodeURIComponent(taskId)}`, {
+      method: 'POST',
+      body: JSON.stringify({ expectedEtag }),
     }),
 
   improveTitle: (currentTitle, userInstruction) =>

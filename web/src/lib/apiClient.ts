@@ -19,7 +19,10 @@ export interface ApiClient {
   updateOrder(items: { id: string; order: number }[]): Promise<void>;
   markNotificationRead(id: string): Promise<void>;
   addComment(taskId: string, payload: { text: string; attachments?: Attachment[] }): Promise<Task>;
+  editComment(taskId: string, commentId: string, text: string, authorEmail: string): Promise<Task>;
+  deleteComment(taskId: string, index: number): Promise<Task>;
   signalResponsible(taskId: string, targets: string[]): Promise<Task>;
+  dismissAlert(taskId: string, expectedEtag?: string): Promise<Task>;
   improveTitle(currentTitle: string, userInstruction?: string): Promise<{ title: string }>;
   uploadAttachment(file: File): Promise<Attachment>;
   addUser(payload: UserInput): Promise<User>;
