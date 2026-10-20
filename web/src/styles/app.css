@@ -1772,3 +1772,131 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ===================== Animações premium + cubo ===================== */
+
+/* Cubo mágico 3D (loading / splash) */
+.cube {
+  width: var(--cube-size, 48px);
+  height: var(--cube-size, 48px);
+  perspective: calc(var(--cube-size, 48px) * 4);
+  display: inline-block;
+  flex: none;
+}
+.cube__box {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  animation: cube-spin 3s linear infinite;
+}
+.cube__face {
+  position: absolute;
+  inset: 0;
+  border-radius: 6px;
+  border: 2px solid rgba(17, 24, 39, 0.9);
+  background-color: var(--sb-accent);
+  background-image:
+    linear-gradient(rgba(17, 24, 39, 0.4) 2px, transparent 2px),
+    linear-gradient(90deg, rgba(17, 24, 39, 0.4) 2px, transparent 2px);
+  background-size: 33.333% 33.333%;
+}
+.cube__face--top,
+.cube__face--bottom { background-color: var(--sb-accent); }
+.cube__face--left,
+.cube__face--right { background-color: var(--sb-surface); }
+.cube__face--front,
+.cube__face--back {
+  background-color: var(--sb-action);
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.4) 2px, transparent 2px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.4) 2px, transparent 2px);
+}
+.cube__face--front { transform: translateZ(calc(var(--cube-size, 48px) / 2)); }
+.cube__face--back { transform: rotateY(180deg) translateZ(calc(var(--cube-size, 48px) / 2)); }
+.cube__face--right { transform: rotateY(90deg) translateZ(calc(var(--cube-size, 48px) / 2)); }
+.cube__face--left { transform: rotateY(-90deg) translateZ(calc(var(--cube-size, 48px) / 2)); }
+.cube__face--top { transform: rotateX(90deg) translateZ(calc(var(--cube-size, 48px) / 2)); }
+.cube__face--bottom { transform: rotateX(-90deg) translateZ(calc(var(--cube-size, 48px) / 2)); }
+@keyframes cube-spin {
+  0% { transform: rotateX(-26deg) rotateY(0deg); }
+  100% { transform: rotateX(-26deg) rotateY(360deg); }
+}
+.app-splash .cube { animation: cube-breathe 3s ease-in-out infinite; }
+@keyframes cube-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+/* Micro-interações */
+.task-card {
+  transition: transform 0.14s ease, box-shadow 0.14s ease;
+}
+.task-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(17, 24, 39, 0.1);
+}
+.sb-button {
+  transition: filter 0.12s ease, transform 0.06s ease, background 0.12s ease;
+}
+.sb-button:active:not(:disabled) {
+  transform: translateY(1px) scale(0.99);
+}
+.sidebar__nav,
+.sidebar__project,
+.home__task,
+.list__row,
+.viewtoggle button,
+.tabs button,
+.filterbar__select,
+.sb-input,
+.sb-textarea,
+.sb-select {
+  transition: background 0.14s ease, color 0.14s ease, border-color 0.14s ease, box-shadow 0.14s ease;
+}
+
+/* Entradas (overlay/modal/menus/avisos) */
+.modal-overlay { animation: sb-fade 0.18s ease; }
+.modal { animation: sb-pop 0.24s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.card-menu__list,
+.notif,
+.mention-menu { animation: sb-pop 0.16s ease both; }
+.workspace__notice { animation: sb-slide-down 0.26s ease both; }
+@keyframes sb-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes sb-pop {
+  from { opacity: 0; transform: translateY(10px) scale(0.985); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes sb-slide-down {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Destaque da coluna ao arrastar */
+.board-column.is-drop {
+  background: color-mix(in srgb, var(--sb-action) 7%, transparent);
+  border-radius: var(--sb-radius-panel);
+  outline: 2px dashed color-mix(in srgb, var(--sb-action) 50%, var(--sb-panel-border));
+  outline-offset: 2px;
+  transition: background 0.12s ease;
+}
+
+/* Barra de progresso animada */
+.progress__fill { transition: width 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
+
+/* Badge do sino pulsa quando há não lidas */
+.topbar__badge { animation: sb-pulse 1.8s ease-in-out infinite; }
+@keyframes sb-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.18); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  .cube__box { animation: none; transform: rotateX(-26deg) rotateY(-32deg); }
+  .task-card:hover { transform: none; }
+}

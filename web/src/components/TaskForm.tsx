@@ -3,6 +3,7 @@ import type { Task, User, Attachment, Person } from '../types/api';
 import { personName } from '../types/api';
 import { api } from '../lib/api';
 import { useEscape } from '../lib/useEscape';
+import { play } from '../lib/sound';
 import { BOARD_COLUMNS, STATUS_META } from '../lib/status';
 
 const PRIORITIES = ['Baixa', 'Média', 'Alta'];
@@ -107,8 +108,10 @@ export function TaskForm({ mode, task, users, onClose, notify }: Props) {
           attachments,
         });
       }
+      play('success');
       onClose();
     } catch (e) {
+      play('error');
       notify(e instanceof Error ? e.message : 'Falha ao salvar a tarefa.');
     } finally {
       setSaving(false);

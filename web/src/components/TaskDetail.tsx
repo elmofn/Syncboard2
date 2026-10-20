@@ -3,6 +3,7 @@ import type { Task, User, ClientPrincipal, PersonRef, Attachment } from '../type
 import { personName } from '../types/api';
 import { api } from '../lib/api';
 import { useEscape } from '../lib/useEscape';
+import { play } from '../lib/sound';
 import { buildTaskFlow } from '../lib/flow';
 import { Avatar } from './Avatar';
 import { StatusBadge } from './StatusBadge';
@@ -72,6 +73,7 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify }
     try {
       await fn();
     } catch (e) {
+      play('error');
       notify(e instanceof Error ? e.message : errMsg);
     } finally {
       setBusy(false);
@@ -79,10 +81,10 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify }
   };
 
   const decide = (action: 'approve' | 'reject') =>
-    run(
-      () => api.updateTask(task.id, { homologationAction: action, expectedStatus: 'homologation', expectedEtag: task._etag }),
-      'Falha na decisão de homologação.',
-    );
+    run(async () => {
+      await api.updateTask(task.id, { homologationAction: action, expectedStatus: 'homologation', expectedEtag: task._etag });
+      play(action === 'approve' ? 'success' : 'move');
+    }, 'Falha na decisão de homologação.');
 
   const forward = () => {
     if (!forwardTo || !forwardNote.trim()) {
@@ -119,11 +121,12 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify }
     }
     void run(async () => {
       await api.signalResponsible(task.id, attnTargets);
+      play('notify');
       setAttnOpen(false);
     }, 'Falha ao chamar atenção.');
   };
 
-  const dismiss = () => run(() => api.dismissAlert(task.id, task._etag), 'Falha ao confirmar.');
+  const dismiss = () => run(async () => { await api.dismissAlert(task.id, task._etag); play('move'); }, 'Falha ao confirmar.');
 
   const saveEditComment = (commentId: string, authorEmail: string) => {
     const html = editRef.current?.innerHTML.trim() ?? '';
@@ -283,7 +286,7 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify }
                 <CommentEditor
                   users={users}
                   notify={notify}
-                  onSubmit={(html, atts) => run(() => api.addComment(task.id, { text: html, attachments: atts.length ? atts : undefined }), 'Falha ao comentar.')}
+                  onSubmit={(html, atts) => run(async () => { await api.addComment(task.id, { text: html, attachments: atts.length ? atts : undefined }); play('send'); }, 'Falha ao comentar.')}
                 />
                 <p className="sb-meta">Enter envia; Shift + Enter cria uma linha. Use @ para mencionar.</p>
               </div>

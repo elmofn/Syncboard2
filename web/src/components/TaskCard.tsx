@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Task } from '../types/api';
 import { api } from '../lib/api';
+import { play } from '../lib/sound';
 import { ProgressBar } from './ProgressBar';
 import { TaskFlowMini } from './TaskFlowMini';
 
@@ -32,15 +33,16 @@ export function TaskCard({ task, onDragStart, onOpen, notify }: Props) {
     try {
       await fn();
     } catch (e) {
+      play('error');
       notify?.(e instanceof Error ? e.message : err);
     }
   };
 
   const decide = (action: 'approve' | 'reject') =>
-    act(
-      () => api.updateTask(task.id, { homologationAction: action, expectedStatus: 'homologation', expectedEtag: task._etag }),
-      'Falha na decisão de homologação.',
-    );
+    act(async () => {
+      await api.updateTask(task.id, { homologationAction: action, expectedStatus: 'homologation', expectedEtag: task._etag });
+      play(action === 'approve' ? 'success' : 'move');
+    }, 'Falha na decisão de homologação.');
 
   const del = () => {
     setMenuOpen(false);

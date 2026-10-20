@@ -1,6 +1,7 @@
 import { useAuth } from './hooks/useAuth';
 import { Login } from './components/Login';
 import { Workspace } from './components/Workspace';
+import { CubeSpinner } from './components/CubeSpinner';
 
 export default function App() {
   const { user, loading } = useAuth();
@@ -8,7 +9,7 @@ export default function App() {
   if (loading) {
     return (
       <div className="app-splash">
-        <img src="/brand/mark-primary.svg" alt="SyncBOARD" width={64} height={64} />
+        <CubeSpinner size={72} label="Carregando o SyncBOARD" />
       </div>
     );
   }

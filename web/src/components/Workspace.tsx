@@ -6,6 +6,7 @@ import { EMPTY_FILTERS, filterTasks, type Filters } from '../lib/filter';
 import { VIEW_LABEL, type View } from '../lib/views';
 import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
+import { CubeSpinner } from './CubeSpinner';
 import { WorkHeader } from './WorkHeader';
 import { FilterBar } from './FilterBar';
 import { Board } from './Board';
@@ -214,7 +215,7 @@ export function Workspace({ user }: { user: ClientPrincipal }) {
 function LoadingBox() {
   return (
     <div className="loading-box sb-meta">
-      <span className="spinner" aria-hidden="true" /> Carregando…
+      <CubeSpinner size={30} /> Carregando…
     </div>
   );
 }

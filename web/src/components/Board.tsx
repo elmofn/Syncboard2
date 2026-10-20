@@ -1,4 +1,4 @@
-import { useRef, type CSSProperties, type DragEvent } from 'react';
+import { useRef, useState, type CSSProperties, type DragEvent } from 'react';
 import type { Task, TaskStatus } from '../types/api';
 import { BOARD_COLUMNS, STATUS_META } from '../lib/status';
 import { TaskCard } from './TaskCard';
@@ -22,10 +22,12 @@ const COLUMN_BORDER: Record<TaskStatus, string> = {
 
 export function Board({ tasks, moveTask, reorderTask, onOpen, notify }: Props) {
   const draggedId = useRef<string | null>(null);
+  const [dropStatus, setDropStatus] = useState<TaskStatus | null>(null);
 
   const onDrop = (status: TaskStatus) => {
     const id = draggedId.current;
     draggedId.current = null;
+    setDropStatus(null);
     if (id) moveTask(id, status);
   };
 
@@ -33,6 +35,7 @@ export function Board({ tasks, moveTask, reorderTask, onOpen, notify }: Props) {
     e.stopPropagation();
     const id = draggedId.current;
     draggedId.current = null;
+    setDropStatus(null);
     if (!id || id === target.id) return;
     const dragged = tasks.find((t) => t.id === id);
     if (!dragged) return;
@@ -58,9 +61,15 @@ export function Board({ tasks, moveTask, reorderTask, onOpen, notify }: Props) {
         return (
           <section
             key={status}
-            className="board-column"
+            className={`board-column${dropStatus === status ? ' is-drop' : ''}`}
             style={{ ['--col' as string]: COLUMN_BORDER[status] } as CSSProperties}
-            onDragOver={(e) => e.preventDefault()}
+            onDragOver={(e) => {
+              e.preventDefault();
+              if (dropStatus !== status) setDropStatus(status);
+            }}
+            onDragLeave={(e) => {
+              if (!e.currentTarget.contains(e.relatedTarget as Node)) setDropStatus((s) => (s === status ? null : s));
+            }}
             onDrop={() => onDrop(status)}
           >
             <header className="board-column__head">

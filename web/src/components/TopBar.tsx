@@ -3,6 +3,7 @@ import type { ClientPrincipal, Notification } from '../types/api';
 import { Avatar } from './Avatar';
 import { NotificationsPanel } from './NotificationsPanel';
 import { ThemeToggle } from './ThemeToggle';
+import { SoundToggle } from './SoundToggle';
 
 interface Props {
   user: ClientPrincipal;
@@ -37,6 +38,7 @@ export function TopBar({ user, crumb, notifications, onMarkRead, onOpenTask, onT
         <span className="topbar__crumb-current">{crumb}</span>
       </nav>
       <div className="topbar__actions">
+        <SoundToggle className="topbar__bell" />
         <ThemeToggle className="topbar__bell" />
         <div className="topbar__notif" ref={ref}>
           <button type="button" className="topbar__bell" aria-label="Notificações" aria-expanded={open} onClick={() => setOpen((v) => !v)}>
