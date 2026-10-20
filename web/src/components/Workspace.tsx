@@ -64,7 +64,20 @@ export function Workspace({ user }: { user: ClientPrincipal }) {
   const priorities = [...new Set(activeTasks.map((t) => t.priority).filter(Boolean))];
 
   const showFilters = view === 'quadro' || view === 'lista';
-  const header = HEADER[view];
+  const greet = () => {
+    const h = new Date().getHours();
+    const base = h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite';
+    const first = (user.claims?.find((c) => c.typ === 'name')?.val || user.userDetails).split(/\s+/)[0];
+    return `${base}, ${first}!`;
+  };
+  const header =
+    view === 'home'
+      ? { title: greet(), subtitle: 'O trabalho em curso e o que precisa da sua atenção.' }
+      : HEADER[view];
+  const goHomologacao = () => {
+    setFilters((f) => ({ ...f, status: 'homologation' }));
+    setView('quadro');
+  };
 
   const flash = (msg: string) => {
     setNotice(msg);
@@ -104,7 +117,7 @@ export function Workspace({ user }: { user: ClientPrincipal }) {
           <WorkHeader
             title={header.title}
             subtitle={header.subtitle}
-            onNewTask={showFilters ? () => setForm({ mode: 'create' }) : undefined}
+            onNewTask={showFilters || view === 'home' ? () => setForm({ mode: 'create' }) : undefined}
           />
 
           {notice && <div className="workspace__notice">{notice}</div>}
@@ -158,7 +171,7 @@ export function Workspace({ user }: { user: ClientPrincipal }) {
             />
           )}
           {view === 'home' && (
-            <HomeView tasks={activeTasks} projects={projects} notifications={notifications} user={user} onOpen={(t) => setOpenId(t.id)} />
+            <HomeView tasks={activeTasks} user={user} onOpen={(t) => setOpenId(t.id)} onGoHomologacao={goHomologacao} />
           )}
         </div>
       </div>
