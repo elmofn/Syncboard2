@@ -13,6 +13,7 @@ import { ListView } from './ListView';
 import { TaskDetail } from './TaskDetail';
 import { TaskForm } from './TaskForm';
 import { PeopleView } from './PeopleView';
+import { HomeView } from './HomeView';
 
 const HEADER: Record<View, { title: string; subtitle: string }> = {
   home: { title: 'Home', subtitle: 'Um resumo do seu trabalho.' },
@@ -70,6 +71,11 @@ export function Workspace({ user }: { user: ClientPrincipal }) {
     window.setTimeout(() => setNotice(null), 3200);
   };
 
+  const markNotification = (id: string) => {
+    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, isRead: true } : n)));
+    api.markNotificationRead(id).catch(() => undefined);
+  };
+
   return (
     <div className="workspace">
       <Sidebar
@@ -86,7 +92,13 @@ export function Workspace({ user }: { user: ClientPrincipal }) {
       />
 
       <div className="workspace__main">
-        <TopBar user={user} crumb={VIEW_LABEL[view]} notifications={notifications} />
+        <TopBar
+          user={user}
+          crumb={VIEW_LABEL[view]}
+          notifications={notifications}
+          onMarkRead={markNotification}
+          onOpenTask={(taskId) => setOpenId(taskId)}
+        />
 
         <div className="workspace__content">
           <WorkHeader
@@ -145,7 +157,9 @@ export function Workspace({ user }: { user: ClientPrincipal }) {
               notify={flash}
             />
           )}
-          {view === 'home' && <p className="sb-meta">Home chega em um próximo passo.</p>}
+          {view === 'home' && (
+            <HomeView tasks={activeTasks} projects={projects} notifications={notifications} user={user} onOpen={(t) => setOpenId(t.id)} />
+          )}
         </div>
       </div>
 
