@@ -137,9 +137,12 @@
 /* ---------- Quadro ---------- */
 .board {
   display: grid;
+  /* As colunas se distribuem na largura visível (1fr); só quando não cabem
+     (tela estreita) elas param em 168px e o quadro rola na horizontal.
+     grid-auto-flow mantém a regra válida para qualquer número de colunas. */
   grid-auto-flow: column;
-  grid-auto-columns: minmax(260px, 1fr);
-  gap: var(--sb-sp-4);
+  grid-auto-columns: minmax(168px, 1fr);
+  gap: var(--sb-sp-3);
   align-items: start;
   min-height: 100%;
 }
