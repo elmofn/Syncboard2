@@ -11,6 +11,9 @@ import { ProgressBar } from './ProgressBar';
 import { CommentEditor } from './CommentEditor';
 import { useConfirm } from './ConfirmDialog';
 import { SignalModal } from './SignalModal';
+import { ArrowCounterClockwise, ArrowRight, CalendarBlank, Check, Eye, File, Flag, Megaphone, PencilSimple, Plus, X } from '@phosphor-icons/react';
+import type { ComponentType } from 'react';
+import type { IconProps } from '@phosphor-icons/react';
 
 type Tab = 'comentarios' | 'anexos' | 'historico';
 
@@ -34,10 +37,10 @@ function fmt(iso?: string): string {
   return `${d.toLocaleDateString('pt-BR')}, ${d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
 }
 
-const HISTORY_ICON: Record<string, string> = {
-  created: '＋',
-  attention_requested: '📣',
-  edited: '✎',
+const HISTORY_ICON: Record<string, ComponentType<IconProps>> = {
+  created: Plus,
+  attention_requested: Megaphone,
+  edited: PencilSimple,
 };
 
 export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify }: Props) {
@@ -195,7 +198,7 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify }
             <span className="modal__chip">#{task.id}</span>
             <StatusBadge status={task.status} />
           </div>
-          <button type="button" className="modal__close" onClick={onClose} aria-label="Fechar" autoFocus>✕</button>
+          <button type="button" className="modal__close" onClick={onClose} aria-label="Fechar" autoFocus><X /></button>
         </header>
 
         <div className="modal__body">
@@ -279,7 +282,7 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify }
                                   {cAtts.length > 0 && (
                                     <div className="comment__atts">
                                       {cAtts.map((a, j) => (
-                                        <a key={j} className="editor__attach-chip" href={a.url} target="_blank" rel="noreferrer">📄 {a.name}</a>
+                                        <a key={j} className="editor__attach-chip" href={a.url} target="_blank" rel="noreferrer"><File /> {a.name}</a>
                                       ))}
                                     </div>
                                   )}
@@ -348,7 +351,7 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify }
                   <ul className="timeline">
                     {history.map((h, i) => (
                       <li key={i} className="timeline__item">
-                        <span className="timeline__icon" aria-hidden="true">{HISTORY_ICON[h.action] || '•'}</span>
+                        <span className="timeline__icon" aria-hidden="true">{(() => { const HIcon = HISTORY_ICON[h.action]; return HIcon ? <HIcon /> : '•'; })()}</span>
                         <div>
                           <Html className="timeline__desc" html={h.description} />
                           <div className="sb-meta">{fmt(h.timestamp)}</div>
@@ -371,7 +374,7 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify }
             <div className="summary__grid">
               <div>
                 <span className="sb-meta">Prioridade</span>
-                <div>⚑ {task.priority}</div>
+                <div><Flag /> {task.priority}</div>
               </div>
               <div>
                 <span className="sb-meta">Prazo</span>
@@ -427,9 +430,9 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify }
             <div className="summary__actions">
               {isHomolog ? (
                 <>
-                  <button type="button" className="sb-button" disabled={busy} onClick={() => decide('approve')}>✓ Aprovar</button>
-                  <button type="button" className="sb-button sb-button--secondary" disabled={busy} onClick={() => setForwardOpen((v) => !v)}>→ Encaminhar</button>
-                  <button type="button" className="sb-button sb-button--secondary action-danger" disabled={busy} onClick={() => decide('reject')}>↺ Reprovar</button>
+                  <button type="button" className="sb-button" disabled={busy} onClick={() => decide('approve')}><Check /> Aprovar</button>
+                  <button type="button" className="sb-button sb-button--secondary" disabled={busy} onClick={() => setForwardOpen((v) => !v)}><ArrowRight /> Encaminhar</button>
+                  <button type="button" className="sb-button sb-button--secondary action-danger" disabled={busy} onClick={() => decide('reject')}><ArrowCounterClockwise /> Reprovar</button>
                   {forwardOpen && (
                     <div className="forward-form">
                       <select className="sb-select" value={forwardTo} onChange={(e) => setForwardTo(e.target.value)}>
@@ -444,12 +447,12 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify }
                   )}
                 </>
               ) : (
-                <button type="button" className="sb-button sb-button--secondary" disabled={busy} onClick={openAttn}>📣 Chamar atenção</button>
+                <button type="button" className="sb-button sb-button--secondary" disabled={busy} onClick={openAttn}><Megaphone /> Chamar atenção</button>
               )}
               {myAlert && (
-                <button type="button" className="sb-button" disabled={busy} onClick={dismiss}>👀 Vou olhar</button>
+                <button type="button" className="sb-button" disabled={busy} onClick={dismiss}><Eye /> Vou olhar</button>
               )}
-              <button type="button" className="sb-button sb-button--secondary" onClick={() => notify('Marcar reunião: integração de calendário chega num próximo passo.')}>📅 Marcar reunião</button>
+              <button type="button" className="sb-button sb-button--secondary" onClick={() => notify('Marcar reunião: integração de calendário chega num próximo passo.')}><CalendarBlank /> Marcar reunião</button>
             </div>
           </aside>
         </div>
@@ -457,8 +460,8 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify }
         <footer className="modal__foot">
           <span className="sb-meta">Alterações e comentários usam as ações desta tarefa.</span>
           <div className="sb-row">
-            <button type="button" className="sb-button sb-button--secondary" onClick={onClose}>✕ Fechar</button>
-            <button type="button" className="sb-button" onClick={onEdit}>✎ Editar tarefa</button>
+            <button type="button" className="sb-button sb-button--secondary" onClick={onClose}><X /> Fechar</button>
+            <button type="button" className="sb-button" onClick={onEdit}><PencilSimple /> Editar tarefa</button>
           </div>
         </footer>
       </div>

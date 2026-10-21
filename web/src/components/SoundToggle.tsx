@@ -1,3 +1,4 @@
+import { SpeakerSimpleHigh, SpeakerSimpleSlash } from '@phosphor-icons/react';
 import { useSound } from '../lib/sound';
 
 export function SoundToggle({ className }: { className?: string }) {
@@ -10,7 +11,7 @@ export function SoundToggle({ className }: { className?: string }) {
       aria-label={muted ? 'Ativar som' : 'Silenciar'}
       title={muted ? 'Ativar som' : 'Silenciar'}
     >
-      {muted ? '🔇' : '🔊'}
+      {muted ? <SpeakerSimpleSlash /> : <SpeakerSimpleHigh />}
     </button>
   );
 }

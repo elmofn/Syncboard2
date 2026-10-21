@@ -3,6 +3,7 @@ import { STATUS_META } from '../lib/status';
 
 export function StatusBadge({ status }: { status: TaskStatus }) {
   const meta = STATUS_META[status];
+  const Icon = meta.icon;
   return (
     <span
       className="sb-badge"
@@ -12,7 +13,7 @@ export function StatusBadge({ status }: { status: TaskStatus }) {
         color: `var(--sb-status-${meta.colorVar}-fg)`,
       }}
     >
-      <span aria-hidden="true">{meta.icon}</span> {meta.label}
+      <Icon aria-hidden="true" /> {meta.label}
     </span>
   );
 }

@@ -1,3 +1,4 @@
+import { ArrowRight } from '@phosphor-icons/react';
 import type { Task } from '../types/api';
 import { buildTaskFlow } from '../lib/flow';
 import { Avatar } from './Avatar';
@@ -21,7 +22,7 @@ export function TaskFlowMini({ task }: { task: Task }) {
       {truncated && <span className="flowmini__sep" aria-hidden="true">…</span>}
       {shown.map((step, i) => (
         <span key={i} className="flowmini__step">
-          {i > 0 && <span className="flowmini__arrow" aria-hidden="true">→</span>}
+          {i > 0 && <ArrowRight className="flowmini__arrow" aria-hidden="true" />}
           <AvatarGroup people={step.people} />
         </span>
       ))}

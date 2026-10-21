@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import type { Task, TaskStatus, ClientPrincipal } from '../types/api';
 import { personEmail, personName } from '../types/api';
+import type { ComponentType } from 'react';
+import type { IconProps } from '@phosphor-icons/react';
+import { ArrowUpRight, Diamond, Pause, Play, SquaresFour, Tray } from '@phosphor-icons/react';
 import { STATUS_META } from '../lib/status';
 import { StatusBadge } from './StatusBadge';
 
@@ -41,10 +44,10 @@ export function HomeView({ tasks, user, onOpen, onGoHomologacao }: Props) {
   const pendingHomolog = recorte.filter((t) => t.status === 'homologation' && personEmail(t.homologador).toLowerCase() === email);
 
   const kpis = [
-    { icon: '▦', label: 'Tarefas ativas', value: recorte.length, sub: 'No seu recorte pessoal' },
-    { icon: '⏸', label: 'Parado', value: countBy('stopped'), sub: 'Estado registrado na tarefa' },
-    { icon: '◇', label: 'Em homologação', value: countBy('homologation'), sub: 'Aguardam validação' },
-    { icon: '↗', label: 'Em publicação', value: countBy('publication'), sub: 'Ainda não concluídas' },
+    { icon: SquaresFour as ComponentType<IconProps>, label: 'Tarefas ativas', value: recorte.length, sub: 'No seu recorte pessoal' },
+    { icon: Pause as ComponentType<IconProps>, label: 'Parado', value: countBy('stopped'), sub: 'Estado registrado na tarefa' },
+    { icon: Diamond as ComponentType<IconProps>, label: 'Em homologação', value: countBy('homologation'), sub: 'Aguardam validação' },
+    { icon: ArrowUpRight as ComponentType<IconProps>, label: 'Em publicação', value: countBy('publication'), sub: 'Ainda não concluídas' },
   ];
 
   const TABS: { key: Tab; label: string; count: number }[] = [
@@ -67,13 +70,16 @@ export function HomeView({ tasks, user, onOpen, onGoHomologacao }: Props) {
   return (
     <div className="home">
       <div className="home__kpis">
-        {kpis.map((k) => (
+        {kpis.map((k) => {
+          const KIcon = k.icon;
+          return (
           <div key={k.label} className="kpi">
-            <span className="kpi__top">{k.icon} {k.label}</span>
+            <span className="kpi__top"><KIcon /> {k.label}</span>
             <span className="kpi__value">{k.value}</span>
             <span className="kpi__sub">{k.sub}</span>
           </div>
-        ))}
+          );
+        })}
       </div>
       <p className="home__note">
         Resumo das tarefas carregadas em que você é responsável ou homologador pendente. Os números não representam um total global.
@@ -82,7 +88,7 @@ export function HomeView({ tasks, user, onOpen, onGoHomologacao }: Props) {
       <div className="home__main">
         <div className="home__left">
           <div className="home__section-head">
-            <h2>▷ Tarefas em Andamento</h2>
+            <h2><Play /> Tarefas em Andamento</h2>
             <span className="sb-meta">{selected.length} tarefas neste recorte</span>
           </div>
 
@@ -98,7 +104,7 @@ export function HomeView({ tasks, user, onOpen, onGoHomologacao }: Props) {
           <div className="home__listbox">
             {selected.length === 0 ? (
               <div className="home-empty">
-                <span aria-hidden="true" style={{ fontSize: 28 }}>📭</span>
+                <Tray aria-hidden="true" size={28} />
                 <strong>Nenhuma tarefa nesta seleção</strong>
                 <span className="sb-meta">Escolha outra etapa para consultar as suas tarefas.</span>
               </div>
@@ -145,7 +151,7 @@ export function HomeView({ tasks, user, onOpen, onGoHomologacao }: Props) {
           <h2 className="home__right-title">Precisa de atenção</h2>
           {pendingHomolog.length > 0 ? (
             <div className="attn sb-card">
-              <span className="attn__icon">◇</span>
+              <span className="attn__icon"><Diamond /></span>
               <strong>{pendingHomolog.length} · Aguardando sua homologação</strong>
               <span className="sb-meta">Sua validação está pendente nestas tarefas.</span>
               <button type="button" className="attn__link" onClick={onGoHomologacao}>Ver homologação</button>

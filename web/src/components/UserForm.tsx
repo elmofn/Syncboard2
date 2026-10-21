@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { FloppyDisk, X } from '@phosphor-icons/react';
 import type { User } from '../types/api';
 import { api } from '../lib/api';
 import { useEscape } from '../lib/useEscape';
@@ -48,7 +49,7 @@ export function UserForm({ mode, user, onClose, onSaved, notify }: Props) {
       <div className="modal modal--sm" role="dialog" aria-modal="true" aria-label={isEdit ? 'Editar usuário' : 'Novo usuário'} onClick={(e) => e.stopPropagation()}>
         <header className="modal__head">
           <span className="modal__chip modal__chip--active">{isEdit ? 'EDITAR USUÁRIO' : 'NOVO USUÁRIO'}</span>
-          <button type="button" className="modal__close" onClick={onClose} aria-label="Fechar">✕</button>
+          <button type="button" className="modal__close" onClick={onClose} aria-label="Fechar"><X /></button>
         </header>
         <div className="modal__single form">
           <label className="field">
@@ -74,7 +75,7 @@ export function UserForm({ mode, user, onClose, onSaved, notify }: Props) {
           <span className="sb-meta">As alterações só são enviadas ao salvar.</span>
           <div className="sb-row">
             <button type="button" className="sb-button sb-button--secondary" onClick={onClose}>Cancelar</button>
-            <button type="button" className="sb-button" onClick={save} disabled={saving}>💾 {saving ? 'Salvando…' : 'Salvar'}</button>
+            <button type="button" className="sb-button" onClick={save} disabled={saving}><FloppyDisk /> {saving ? 'Salvando…' : 'Salvar'}</button>
           </div>
         </footer>
       </div>

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { Bell, List } from '@phosphor-icons/react';
 import type { ClientPrincipal, Notification } from '../types/api';
 import { Avatar } from './Avatar';
 import { NotificationsPanel } from './NotificationsPanel';
@@ -31,7 +32,7 @@ export function TopBar({ user, crumb, notifications, onMarkRead, onOpenTask, onT
 
   return (
     <div className="topbar">
-      <button type="button" className="topbar__burger" aria-label="Menu" onClick={onToggleSidebar}>☰</button>
+      <button type="button" className="topbar__burger" aria-label="Menu" onClick={onToggleSidebar}><List /></button>
       <nav className="topbar__crumb sb-meta" aria-label="Trilha">
         <span>Espaço de trabalho</span>
         <span aria-hidden="true">/</span>
@@ -42,7 +43,7 @@ export function TopBar({ user, crumb, notifications, onMarkRead, onOpenTask, onT
         <ThemeToggle className="topbar__bell" />
         <div className="topbar__notif" ref={ref}>
           <button type="button" className="topbar__bell" aria-label="Notificações" aria-expanded={open} onClick={() => setOpen((v) => !v)}>
-            🔔
+            <Bell />
             {unread > 0 && <span className="topbar__badge">{unread}</span>}
           </button>
           {open && (

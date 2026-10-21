@@ -1,3 +1,4 @@
+import { SignOut, SquaresFour } from '@phosphor-icons/react';
 import type { ClientPrincipal, ProjectCount } from '../types/api';
 import type { View } from '../lib/views';
 import { logout } from '../lib/auth';
@@ -37,7 +38,7 @@ export function Sidebar({ user, view, onNavigate, projects, activeCount, activeP
         </span>
       </button>
       <button type="button" className="sidebar__selector">
-        <span className="sidebar__selector-badge sidebar__selector-badge--board">▦</span>
+        <span className="sidebar__selector-badge sidebar__selector-badge--board"><SquaresFour /></span>
         <span>
           <small>BOARD</small>
           Quadro de trabalho
@@ -85,7 +86,7 @@ export function Sidebar({ user, view, onNavigate, projects, activeCount, activeP
           <small>{user.claims?.find((c) => c.typ === 'role')?.val || 'Membro'}</small>
         </span>
         <button type="button" className="sidebar__logout" title="Sair" onClick={logout} aria-label="Sair">
-          ⎋
+          <SignOut />
         </button>
       </div>
     </aside>

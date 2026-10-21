@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Check, Robot, Sparkle, X } from '@phosphor-icons/react';
 import { api } from '../lib/api';
 import { useEscape } from '../lib/useEscape';
 import { play } from '../lib/sound';
@@ -45,10 +46,10 @@ export function AiTitleModal({ original, onApply, onClose }: Props) {
       <div className="ai-modal" role="dialog" aria-modal="true" aria-labelledby="ai-title-heading" onClick={(e) => e.stopPropagation()}>
         <header className="ai-modal__head">
           <div className="sb-row">
-            <span className="ai-modal__bot" aria-hidden="true">🤖</span>
+            <span className="ai-modal__bot" aria-hidden="true"><Robot size={24} /></span>
             <h2 id="ai-title-heading">Revisar título com IA</h2>
           </div>
-          <button type="button" className="modal__close ai-modal__close" onClick={onClose} aria-label="Fechar">✕</button>
+          <button type="button" className="modal__close ai-modal__close" onClick={onClose} aria-label="Fechar"><X /></button>
         </header>
 
         <div className="ai-modal__body">
@@ -87,10 +88,10 @@ export function AiTitleModal({ original, onApply, onClose }: Props) {
         <footer className="ai-modal__foot">
           <button type="button" className="sb-button sb-button--secondary" onClick={onClose}>Cancelar</button>
           <button type="button" className="sb-button ai-modal__gen" onClick={generate} disabled={generating}>
-            ✨ {generating ? 'Gerando…' : result !== null ? 'Gerar de novo' : 'Gerar'}
+            <Sparkle /> {generating ? 'Gerando…' : result !== null ? 'Gerar de novo' : 'Gerar'}
           </button>
           {result !== null && (
-            <button type="button" className="sb-button" onClick={apply} disabled={!result.trim()}>✓ Aplicar</button>
+            <button type="button" className="sb-button" onClick={apply} disabled={!result.trim()}><Check /> Aplicar</button>
           )}
         </footer>
       </div>

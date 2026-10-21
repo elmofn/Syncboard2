@@ -1,3 +1,4 @@
+import { Megaphone, CheckCircle } from '@phosphor-icons/react';
 import { useEscape } from '../lib/useEscape';
 
 export interface IncomingAlert {
@@ -21,7 +22,7 @@ export function AlertModal({ alert, queueCount, busy, onAck, onSkip }: Props) {
   return (
     <div className="modal-overlay alert-overlay" onClick={(e) => e.stopPropagation()}>
       <div className="alert-modal" role="alertdialog" aria-modal="true" aria-labelledby="alert-title">
-        <div className="alert-modal__icon" aria-hidden="true">📣</div>
+        <div className="alert-modal__icon" aria-hidden="true"><Megaphone size={30} /></div>
         <h2 id="alert-title" className="alert-modal__title">Atenção Solicitada</h2>
         <p className="alert-modal__help">
           <strong>{alert.signaledBy || 'Alguém'}</strong> solicitou sua atenção na tarefa abaixo:
@@ -33,7 +34,7 @@ export function AlertModal({ alert, queueCount, busy, onAck, onSkip }: Props) {
         </div>
 
         <button type="button" className="sb-button alert-modal__ack" disabled={busy} onClick={onAck}>
-          ✓ Recebido, vou olhar!
+          <CheckCircle /> Recebido, vou olhar!
         </button>
         <button type="button" className="sb-button sb-button--secondary alert-modal__skip" disabled={busy} onClick={onSkip}>
           Agora não

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { User, PersonRef } from '../types/api';
 import { personEmail } from '../types/api';
+import { ShieldCheck } from '@phosphor-icons/react';
 import { useEscape } from '../lib/useEscape';
 import { play } from '../lib/sound';
 
@@ -27,7 +28,7 @@ export function HomologadorModal({ users, current, busy, onConfirm, onClose }: P
   return (
     <div className="modal-overlay homolog-overlay" onClick={(e) => { e.stopPropagation(); onClose(); }}>
       <div className="homolog-modal" role="dialog" aria-modal="true" aria-labelledby="homolog-title" onClick={(e) => e.stopPropagation()}>
-        <div className="homolog-modal__icon" aria-hidden="true">🛡️</div>
+        <div className="homolog-modal__icon" aria-hidden="true"><ShieldCheck size={28} /></div>
         <h2 id="homolog-title" className="homolog-modal__title">Quem vai homologar?</h2>
         <p className="homolog-modal__help">Selecione o responsável por validar esta tarefa antes da publicação.</p>
 

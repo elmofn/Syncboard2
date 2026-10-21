@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useRef, useState, type ReactNode } from 'react';
+import { Question, Trash } from '@phosphor-icons/react';
 import { useEscape } from '../lib/useEscape';
 import { play } from '../lib/sound';
 
@@ -9,8 +10,8 @@ export interface ConfirmOptions {
   cancelLabel?: string;
   /** Realça o botão de confirmação como ação destrutiva. */
   danger?: boolean;
-  /** Emoji/ícone exibido no topo. */
-  icon?: string;
+  /** Ícone exibido no topo. */
+  icon?: ReactNode;
 }
 
 type Resolver = (ok: boolean) => void;
@@ -52,7 +53,7 @@ function ConfirmDialog({ opts, onCancel, onConfirm }: { opts: ConfirmOptions; on
     <div className="modal-overlay confirm-overlay" onClick={onCancel}>
       <div className="confirm" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title" onClick={(e) => e.stopPropagation()}>
         <div className={`confirm__icon${opts.danger ? ' confirm__icon--danger' : ''}`} aria-hidden="true">
-          {opts.icon ?? (opts.danger ? '🗑' : '❔')}
+          {opts.icon ?? (opts.danger ? <Trash size={28} /> : <Question size={28} />)}
         </div>
         <h2 id="confirm-title" className="confirm__title">{opts.title ?? 'Tem certeza?'}</h2>
         <p className="confirm__message">{opts.message}</p>

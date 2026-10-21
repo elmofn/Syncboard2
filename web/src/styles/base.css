@@ -164,6 +164,11 @@ button {
   font-weight: 700;
   color: var(--sb-text);
 }
+/* Alinhamento dos ícones Phosphor em contexto de texto inline */
+.sb-label svg,
+.sb-meta svg {
+  vertical-align: -0.15em;
+}
 .sb-input,
 .sb-textarea,
 .sb-select {

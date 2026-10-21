@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { File, ListBullets, PaperPlaneRight, Paperclip, X } from '@phosphor-icons/react';
 import type { Attachment, User } from '../types/api';
 import { api } from '../lib/api';
 
@@ -119,8 +120,8 @@ export function CommentEditor({ users, onSubmit, notify }: Props) {
         <button type="button" onClick={() => exec('bold')} aria-label="Negrito"><b>B</b></button>
         <button type="button" onClick={() => exec('italic')} aria-label="Itálico"><i>I</i></button>
         <button type="button" onClick={() => exec('underline')} aria-label="Sublinhado"><u>U</u></button>
-        <button type="button" onClick={() => exec('insertUnorderedList')} aria-label="Lista">☰</button>
-        <button type="button" onClick={() => fileRef.current?.click()} aria-label="Anexar">📎</button>
+        <button type="button" onClick={() => exec('insertUnorderedList')} aria-label="Lista"><ListBullets /></button>
+        <button type="button" onClick={() => fileRef.current?.click()} aria-label="Anexar"><Paperclip /></button>
         <input ref={fileRef} type="file" multiple hidden onChange={(e) => onPickFiles(e.target.files)} />
       </div>
 
@@ -152,15 +153,15 @@ export function CommentEditor({ users, onSubmit, notify }: Props) {
         <div className="editor__attachments">
           {attachments.map((a, i) => (
             <span key={i} className="editor__attach-chip">
-              📄 {a.name}
-              <button type="button" onClick={() => setAttachments((p) => p.filter((_, j) => j !== i))} aria-label="Remover">✕</button>
+              <File /> {a.name}
+              <button type="button" onClick={() => setAttachments((p) => p.filter((_, j) => j !== i))} aria-label="Remover"><X /></button>
             </span>
           ))}
         </div>
       )}
 
       <button type="button" className="editor__send sb-button" onClick={send} disabled={busy} aria-label="Enviar">
-        ➤
+        <PaperPlaneRight weight="fill" />
       </button>
     </div>
   );

@@ -58,6 +58,7 @@ export function Board({ tasks, moveTask, reorderTask, onOpen, notify }: Props) {
         const column = tasks
           .filter((t) => t.status === status)
           .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+        const StatusIcon = STATUS_META[status].icon;
         return (
           <section
             key={status}
@@ -73,7 +74,7 @@ export function Board({ tasks, moveTask, reorderTask, onOpen, notify }: Props) {
             onDrop={() => onDrop(status)}
           >
             <header className="board-column__head">
-              <span aria-hidden="true">{STATUS_META[status].icon}</span>
+              <StatusIcon aria-hidden="true" />
               <h2>{STATUS_META[status].label}</h2>
               <span className="board-column__count sb-meta">{column.length}</span>
             </header>

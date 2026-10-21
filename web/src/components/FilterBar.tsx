@@ -1,3 +1,4 @@
+import { MagnifyingGlass } from '@phosphor-icons/react';
 import type { Filters } from '../lib/filter';
 import { hasActiveFilters, EMPTY_FILTERS } from '../lib/filter';
 import { BOARD_COLUMNS, STATUS_META } from '../lib/status';
@@ -15,7 +16,7 @@ export function FilterBar({ filters, projects, users, priorities, onChange }: Pr
   return (
     <div className="filterbar">
       <div className="filterbar__search">
-        <span aria-hidden="true">🔍</span>
+        <MagnifyingGlass aria-hidden="true" />
         <input
           className="filterbar__input"
           placeholder="Buscar por título ou ID"

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { ClientPrincipal, Notification, ProjectCount, Task, TaskStatus, User } from '../types/api';
 import { personEmail } from '../types/api';
+import { ListBullets, SquaresFour } from '@phosphor-icons/react';
 import { api } from '../lib/api';
 import { useTasks } from '../hooks/useTasks';
 import { EMPTY_FILTERS, filterTasks, type Filters } from '../lib/filter';
@@ -223,14 +224,14 @@ export function Workspace({ user }: { user: ClientPrincipal }) {
                       className={view === 'quadro' ? 'is-active' : ''}
                       onClick={() => setView('quadro')}
                     >
-                      ▦ Quadro
+                      <SquaresFour /> Quadro
                     </button>
                     <button
                       type="button"
                       className={view === 'lista' ? 'is-active' : ''}
                       onClick={() => setView('lista')}
                     >
-                      ☰ Lista
+                      <ListBullets /> Lista
                     </button>
                   </div>
                 </div>

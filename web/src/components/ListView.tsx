@@ -1,3 +1,4 @@
+import { Flag } from '@phosphor-icons/react';
 import type { Task } from '../types/api';
 import { personName } from '../types/api';
 import { StatusBadge } from './StatusBadge';
@@ -44,7 +45,7 @@ export function ListView({ tasks, onOpen }: { tasks: Task[]; onOpen?: (task: Tas
             <span className="sb-meta">{task.createdBy || 'Não registrado'}</span>
             <span className="sb-meta">{responsibleNames(task)}</span>
             <span className="sb-meta">{personName(task.homologador) || 'Não informado'}</span>
-            <span className="sb-meta">⚑ {task.priority || '—'}</span>
+            <span className="sb-meta list__prio"><Flag /> {task.priority || '—'}</span>
             <span className="sb-meta">{task.dueDate ? new Date(task.dueDate).toLocaleDateString('pt-BR') : 'Sem prazo'}</span>
             <span className="list__progress">
               <ProgressBar value={task.progress ?? 0} />

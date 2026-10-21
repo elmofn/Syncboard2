@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { Task } from '../types/api';
 import { api } from '../lib/api';
 import { play } from '../lib/sound';
+import { ArrowRight, ArrowCounterClockwise, ArrowsOutSimple, ChatCircle, DotsThree, Flag, Trash } from '@phosphor-icons/react';
 import { useConfirm } from './ConfirmDialog';
 import { ProgressBar } from './ProgressBar';
 import { TaskFlowMini } from './TaskFlowMini';
@@ -71,7 +72,7 @@ export function TaskCard({ task, onDragStart, onOpen, notify }: Props) {
           {task.id}
         </span>
         <div className="task-card__top-right">
-          <span className="sb-meta">⚑ {task.priority}</span>
+          <span className="sb-meta"><Flag /> {task.priority}</span>
           <span className="sb-meta">{task.dueDate ? new Date(task.dueDate).toLocaleDateString('pt-BR') : 'Sem prazo'}</span>
           <div className="card-menu" ref={menuRef}>
             <button
@@ -85,21 +86,21 @@ export function TaskCard({ task, onDragStart, onOpen, notify }: Props) {
                 setMenuOpen((v) => !v);
               }}
             >
-              ⋯
+              <DotsThree weight="bold" />
             </button>
             {menuOpen && (
               <div className="card-menu__list" role="menu" onClick={(e) => e.stopPropagation()}>
                 <button type="button" role="menuitem" onClick={() => { setMenuOpen(false); onOpen?.(task); }}>
-                  ⤢ Detalhes
+                  <ArrowsOutSimple /> Detalhes
                 </button>
                 {isHomolog && (
                   <>
-                    <button type="button" role="menuitem" onClick={() => decide('approve')}>→ Aprovar</button>
-                    <button type="button" role="menuitem" className="is-danger" onClick={() => decide('reject')}>↺ Reprovar</button>
-                    <button type="button" role="menuitem" onClick={() => { setMenuOpen(false); onOpen?.(task); }}>→ Encaminhar</button>
+                    <button type="button" role="menuitem" onClick={() => decide('approve')}><ArrowRight /> Aprovar</button>
+                    <button type="button" role="menuitem" className="is-danger" onClick={() => decide('reject')}><ArrowCounterClockwise /> Reprovar</button>
+                    <button type="button" role="menuitem" onClick={() => { setMenuOpen(false); onOpen?.(task); }}><ArrowRight /> Encaminhar</button>
                   </>
                 )}
-                <button type="button" role="menuitem" className="is-danger" onClick={del}>🗑 Excluir tarefa</button>
+                <button type="button" role="menuitem" className="is-danger" onClick={del}><Trash /> Excluir tarefa</button>
               </div>
             )}
           </div>
@@ -119,7 +120,7 @@ export function TaskCard({ task, onDragStart, onOpen, notify }: Props) {
 
       <div className="task-card__footer">
         <TaskFlowMini task={task} />
-        <span className="sb-meta task-card__comments">💬 {comments}</span>
+        <span className="sb-meta task-card__comments"><ChatCircle /> {comments}</span>
       </div>
     </article>
   );
