@@ -26,11 +26,11 @@
 
   /* Tipografia */
   --sb-font: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
-  --sb-fs-title: 28px;
-  --sb-fs-subtitle: 20px;
-  --sb-fs-body: 16px;
-  --sb-fs-control: 14px;
-  --sb-fs-meta: 12px;
+  --sb-fs-title: 22px;
+  --sb-fs-subtitle: 16px;
+  --sb-fs-body: 14px;
+  --sb-fs-control: 13px;
+  --sb-fs-meta: 11.5px;
 
   /* Espaçamento (4·8·12·16·24·32) */
   --sb-sp-1: 4px;

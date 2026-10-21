@@ -199,11 +199,19 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  flex: none;
+  white-space: nowrap;
 }
 .task-card__top-right {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
   gap: var(--sb-sp-2);
+  row-gap: 2px;
+}
+.task-card__top-right .sb-meta {
+  white-space: nowrap;
 }
 .task-card__title {
   font-size: var(--sb-fs-control);
@@ -1092,11 +1100,11 @@
   font-weight: 400;
 }
 .form__title {
-  font-size: 22px;
+  font-size: 18px;
   font-weight: 800;
   letter-spacing: -0.02em;
-  padding-top: 10px;
-  padding-bottom: 10px;
+  padding-top: 7px;
+  padding-bottom: 7px;
 }
 .form__title::placeholder {
   font-weight: 800;
@@ -1358,7 +1366,7 @@
   background: color-mix(in srgb, var(--sb-status-error-fg) 14%, transparent);
 }
 .confirm__title {
-  font-size: 22px;
+  font-size: 18px;
   font-weight: 800;
   letter-spacing: -0.02em;
   margin-bottom: var(--sb-sp-2);
@@ -1398,7 +1406,7 @@
   background: #6d28d9;
   color: #fff;
 }
-.ai-modal__head h2 { font-size: 18px; font-weight: 800; }
+.ai-modal__head h2 { font-size: 15px; font-weight: 800; }
 .ai-modal__bot { font-size: 22px; }
 .ai-modal__close { color: rgba(255, 255, 255, 0.85); }
 .ai-modal__close:hover { color: #fff; }
@@ -1465,7 +1473,7 @@
   border-radius: 999px;
   background: color-mix(in srgb, var(--sb-accent) 40%, transparent);
 }
-.signal-modal__title { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: var(--sb-sp-2); }
+.signal-modal__title { font-size: 18px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: var(--sb-sp-2); }
 .signal-modal__help { color: var(--sb-muted); font-size: var(--sb-fs-control); line-height: 1.5; margin-bottom: var(--sb-sp-4); }
 .signal-modal__targets {
   display: flex;
@@ -1518,7 +1526,7 @@
   border-radius: 999px;
   background: color-mix(in srgb, var(--sb-status-homologation-fg) 16%, transparent);
 }
-.homolog-modal__title { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: var(--sb-sp-2); }
+.homolog-modal__title { font-size: 18px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: var(--sb-sp-2); }
 .homolog-modal__help { color: var(--sb-muted); font-size: var(--sb-fs-control); line-height: 1.5; margin-bottom: var(--sb-sp-4); }
 .homolog-modal__field { text-align: left; margin-bottom: var(--sb-sp-5); }
 .homolog-modal__actions { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sb-sp-3); }
@@ -1547,7 +1555,7 @@
   background: color-mix(in srgb, var(--sb-accent) 45%, transparent);
   animation: sb-pulse 1.8s ease-in-out infinite;
 }
-.alert-modal__title { font-size: 23px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: var(--sb-sp-2); }
+.alert-modal__title { font-size: 18px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: var(--sb-sp-2); }
 .alert-modal__help { color: var(--sb-muted); font-size: var(--sb-fs-control); line-height: 1.5; margin-bottom: var(--sb-sp-4); }
 .alert-modal__task {
   text-align: left;
@@ -1608,7 +1616,7 @@
   font-size: var(--sb-fs-control);
 }
 .kpi__value {
-  font-size: 40px;
+  font-size: 28px;
   font-weight: 800;
   line-height: 1;
   letter-spacing: -0.02em;

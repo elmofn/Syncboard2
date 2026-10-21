@@ -13,7 +13,7 @@ body {
   margin: 0;
   font-family: var(--sb-font);
   font-size: var(--sb-fs-body);
-  line-height: 1.6;
+  line-height: 1.5;
   color: var(--sb-text);
   background: var(--sb-bg);
   -webkit-font-smoothing: antialiased;
@@ -48,8 +48,8 @@ button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--sb-sp-2);
-  padding: var(--sb-sp-2) var(--sb-sp-4);
+  gap: 6px;
+  padding: 8px 14px;
   border: 1px solid transparent;
   border-radius: var(--sb-radius-control);
   background: var(--sb-action);
@@ -137,20 +137,20 @@ button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   background: var(--sb-ink);
   color: var(--sb-accent);
-  font-size: var(--sb-fs-control);
+  font-size: var(--sb-fs-meta);
   font-weight: 700;
   flex: none;
   overflow: hidden;
 }
 .sb-avatar--sm {
-  width: 28px;
-  height: 28px;
-  font-size: var(--sb-fs-meta);
+  width: 24px;
+  height: 24px;
+  font-size: 10px;
 }
 .sb-avatar img {
   width: 100%;
@@ -173,7 +173,7 @@ button {
 .sb-textarea,
 .sb-select {
   width: 100%;
-  padding: var(--sb-sp-3);
+  padding: 8px 11px;
   border: 1px solid var(--sb-border-strong);
   border-radius: var(--sb-radius-control);
   background: var(--sb-panel);
