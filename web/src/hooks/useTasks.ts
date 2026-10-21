@@ -13,7 +13,8 @@ export function useTasks() {
   const load = useCallback(async () => {
     try {
       setError(null);
-      setTasks(await api.getTasks());
+      const data = await api.getTasks();
+      setTasks(Array.isArray(data) ? data : []);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Falha ao carregar tarefas.');
     }

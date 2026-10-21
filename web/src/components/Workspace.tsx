@@ -129,8 +129,12 @@ export function Workspace({ user }: { user: ClientPrincipal }) {
     }
   };
 
-  const reloadUsers = () => api.getUsers().then(setUsers).catch(() => undefined);
-  const reloadNotifications = () => api.getNotifications().then(setNotifications).catch(() => undefined);
+  // Coerção defensiva: qualquer resposta que não seja array vira [] para não
+  // quebrar renders (ex.: payload inesperado em live).
+  const asArray = <T,>(v: unknown): T[] => (Array.isArray(v) ? (v as T[]) : []);
+  const reloadUsers = () => api.getUsers().then((u) => setUsers(asArray<User>(u))).catch(() => undefined);
+  const reloadNotifications = () =>
+    api.getNotifications().then((n) => setNotifications(asArray<Notification>(n))).catch(() => undefined);
 
   useEffect(() => {
     reloadUsers();
@@ -143,12 +147,13 @@ export function Workspace({ user }: { user: ClientPrincipal }) {
 
   // Recarrega contagens de projeto quando a lista de tarefas muda.
   useEffect(() => {
-    api.getProjectTaskCounts().then(setProjects).catch(() => undefined);
+    api.getProjectTaskCounts().then((p) => setProjects(asArray<ProjectCount>(p))).catch(() => undefined);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tasks]);
 
   useEffect(() => {
     if (view === 'arquivados' && archived === null) {
-      api.getArchivedTasks().then(setArchived).catch(() => setArchived([]));
+      api.getArchivedTasks().then((a) => setArchived(asArray<Task>(a))).catch(() => setArchived([]));
     }
   }, [view, archived]);
 

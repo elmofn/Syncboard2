@@ -15,8 +15,16 @@ async function req<T>(input: string, init?: RequestInit): Promise<T> {
     throw err;
   }
   if (res.status === 204) return undefined as T;
-  const ct = res.headers.get('content-type') || '';
-  return (ct.includes('application/json') ? await res.json() : (await res.text())) as T;
+  // Faz o parse pelo corpo, não pelo Content-Type: o Azure Functions/SWA nem
+  // sempre marca `application/json` em corpos de array, e confiar no header
+  // devolvia uma string (quebrava `.filter`/`.map` no front).
+  const text = await res.text();
+  if (!text) return undefined as T;
+  try {
+    return JSON.parse(text) as T;
+  } catch {
+    return text as unknown as T;
+  }
 }
 
 export const liveApi: ApiClient = {
