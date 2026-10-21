@@ -28,7 +28,7 @@
     {
       "type": "signalR",
       "name": "signalRMessage",
-      "hubName": "default",
+      "hubName": "tasks",
       "connectionStringSetting": "AzureSignalRConnectionString",
       "direction": "out"
     }
