@@ -105,7 +105,7 @@ export function TaskForm({ mode, task, users, onClose, notify }: Props) {
           attachments,
         });
       }
-      play('success');
+      play(isEdit ? 'send' : 'success'); // editar usa o mesmo som de novo comentário
       onClose();
     } catch (e) {
       play('error');

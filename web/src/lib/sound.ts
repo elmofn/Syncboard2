@@ -4,7 +4,7 @@ import { useState } from 'react';
 // e suaves, disparados em ações do usuário (respeitando um mute persistido).
 const KEY = 'sb-sound';
 // Multiplicador de volume global do feedback sonoro.
-const MASTER = 4.5;
+const MASTER = 3.9;
 let ctx: AudioContext | null = null;
 
 function getCtx(): AudioContext | null {
