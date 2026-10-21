@@ -12,10 +12,11 @@ interface Props {
   onDragStart: (id: string, e: DragEvent<HTMLElement>) => void;
   onDragEnd?: () => void;
   onOpen?: (task: Task) => void;
+  onUpdateProgress?: (task: Task) => void;
   notify?: (msg: string) => void;
 }
 
-export function TaskCard({ task, onDragStart, onDragEnd, onOpen, notify }: Props) {
+export function TaskCard({ task, onDragStart, onDragEnd, onOpen, onUpdateProgress, notify }: Props) {
   const hasAlert = Array.isArray(task.pendingAlerts) && task.pendingAlerts.length > 0;
   const comments = Array.isArray(task.comments) ? task.comments.length : 0;
   const isHomolog = task.status === 'homologation';
@@ -118,7 +119,19 @@ export function TaskCard({ task, onDragStart, onDragEnd, onOpen, notify }: Props
         </span>
       )}
 
-      <ProgressBar value={task.progress ?? 0} label labelText="Progresso informado" />
+      {onUpdateProgress ? (
+        <button
+          type="button"
+          className="task-card__progress-btn"
+          title="Atualizar progresso"
+          aria-label={`Atualizar progresso de ${task.id}`}
+          onClick={(e) => { e.stopPropagation(); onUpdateProgress(task); }}
+        >
+          <ProgressBar value={task.progress ?? 0} label labelText="Progresso informado" />
+        </button>
+      ) : (
+        <ProgressBar value={task.progress ?? 0} label labelText="Progresso informado" />
+      )}
 
       <div className="task-card__footer">
         <TaskFlowMini task={task} />

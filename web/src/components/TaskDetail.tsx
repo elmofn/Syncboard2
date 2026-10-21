@@ -12,7 +12,7 @@ import { ProgressBar } from './ProgressBar';
 import { CommentEditor } from './CommentEditor';
 import { useConfirm } from './ConfirmDialog';
 import { SignalModal } from './SignalModal';
-import { ArrowCounterClockwise, ArrowRight, CalendarBlank, Check, Eye, File, Flag, Megaphone, PencilSimple, Plus, X } from '@phosphor-icons/react';
+import { ArrowCounterClockwise, ArrowRight, CalendarBlank, ChartBar, Check, Eye, File, Flag, Megaphone, PencilSimple, Plus, X } from '@phosphor-icons/react';
 import type { ComponentType } from 'react';
 import type { IconProps } from '@phosphor-icons/react';
 
@@ -25,6 +25,7 @@ interface Props {
   onClose: () => void;
   onEdit: () => void;
   notify: (msg: string) => void;
+  onUpdateProgress?: (task: Task) => void;
   /** Ponto do clique (viewport) que abriu a tarefa; a tarefa abre a partir dele. */
   origin?: { x: number; y: number } | null;
 }
@@ -48,7 +49,7 @@ const HISTORY_ICON: Record<string, ComponentType<IconProps>> = {
   edited: PencilSimple,
 };
 
-export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify, origin }: Props) {
+export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify, onUpdateProgress, origin }: Props) {
   const [tab, setTab] = useState<Tab>('comentarios');
   const modalRef = useRef<HTMLDivElement>(null);
   // 'pre' = caixa em tamanho real (sem transform) só para medir; 'enter' = ponto
@@ -267,9 +268,18 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify, 
             <section className="detail-block detail-block--progress">
               <h2>
                 Atualização de Progresso <span className="detail-block__pct">{Math.round(task.progress ?? 0)}%</span>
+                {onUpdateProgress && task.status !== 'homologation' && (
+                  <button type="button" className="detail-block__edit" onClick={() => onUpdateProgress(task)}>
+                    <ChartBar /> Atualizar
+                  </button>
+                )}
               </h2>
               <p className="sb-meta">Pendências informadas na atualização do progresso</p>
-              <p className="detail-block__text">Pendência não informada.</p>
+              <p className="detail-block__text">
+                {(task.progress ?? 0) >= 100
+                  ? 'Progresso informado: 100%'
+                  : task.missingToComplete?.trim() || 'Pendência não informada.'}
+              </p>
             </section>
 
             {task.continuityInstructions && (

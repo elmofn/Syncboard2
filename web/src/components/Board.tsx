@@ -9,6 +9,7 @@ interface Props {
   moveTask: (id: string, status: TaskStatus) => void;
   reorderTask: (id: string, status: TaskStatus, order: number, prevStatus?: TaskStatus, etag?: string) => void;
   onOpen?: (task: Task) => void;
+  onUpdateProgress?: (task: Task) => void;
   notify?: (msg: string) => void;
 }
 
@@ -21,7 +22,7 @@ const COLUMN_BORDER: Record<TaskStatus, string> = {
   done: 'var(--sb-border-strong)',
 };
 
-export function Board({ tasks, moveTask, reorderTask, onOpen, notify }: Props) {
+export function Board({ tasks, moveTask, reorderTask, onOpen, onUpdateProgress, notify }: Props) {
   const draggedId = useRef<string | null>(null);
   const [dragId, setDragId] = useState<string | null>(null);
   const [dragH, setDragH] = useState(96);
@@ -138,7 +139,7 @@ export function Board({ tasks, moveTask, reorderTask, onOpen, notify }: Props) {
                 <Fragment key={task.id}>
                   {phIndex === i && <Placeholder />}
                   <div data-flip={task.id} onDragOver={(e) => onCardDragOver(e, status, i)} onDrop={(e) => onDrop(e, status)}>
-                    <TaskCard task={task} onDragStart={onDragStart} onDragEnd={reset} onOpen={onOpen} notify={notify} />
+                    <TaskCard task={task} onDragStart={onDragStart} onDragEnd={reset} onOpen={onOpen} onUpdateProgress={onUpdateProgress} notify={notify} />
                   </div>
                 </Fragment>
               ))}

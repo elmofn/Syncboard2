@@ -19,6 +19,7 @@ import { TaskForm } from './TaskForm';
 import { PeopleView } from './PeopleView';
 import { HomeView } from './HomeView';
 import { HomologadorModal } from './HomologadorModal';
+import { ProgressUpdateModal } from './ProgressUpdateModal';
 import { AlertModal, type IncomingAlert } from './AlertModal';
 import { play } from '../lib/sound';
 
@@ -40,6 +41,7 @@ export function Workspace({ user }: { user: ClientPrincipal }) {
   const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS);
   const [notice, setNotice] = useState<string | null>(null);
   const [openId, setOpenId] = useState<string | null>(null);
+  const [progressTask, setProgressTask] = useState<Task | null>(null);
   const [openOrigin, setOpenOrigin] = useState<{ x: number; y: number } | null>(null);
   // Último ponto de clique: a tarefa abre a partir dele (sensação de surgir do cartão).
   const lastPointer = useRef<{ x: number; y: number } | null>(null);
@@ -189,6 +191,15 @@ export function Workspace({ user }: { user: ClientPrincipal }) {
     window.setTimeout(() => setNotice(null), 3200);
   };
 
+  // Abre o modal de atualização de progresso (bloqueado durante a homologação).
+  const openProgress = (t: Task) => {
+    if (t.status === 'homologation') {
+      flash('O progresso fica preservado durante a homologação. Use uma decisão de homologação.');
+      return;
+    }
+    setProgressTask(t);
+  };
+
   const markNotification = (id: string) => {
     setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, isRead: true } : n)));
     api.markNotificationRead(id).catch(() => undefined);
@@ -269,7 +280,7 @@ export function Workspace({ user }: { user: ClientPrincipal }) {
           {error && <div className="workspace__notice workspace__notice--error">{error}</div>}
 
           {view === 'quadro' &&
-            (tasks === null ? <LoadingBox /> : <Board tasks={filtered} moveTask={handleMove} reorderTask={handleReorder} onOpen={(t) => handleOpen(t.id)} notify={flash} />)}
+            (tasks === null ? <LoadingBox /> : <Board tasks={filtered} moveTask={handleMove} reorderTask={handleReorder} onOpen={(t) => handleOpen(t.id)} onUpdateProgress={openProgress} notify={flash} />)}
           {view === 'lista' && (tasks === null ? <LoadingBox /> : <ListView tasks={filtered} onOpen={(t) => handleOpen(t.id)} />)}
           {view === 'arquivados' && (archived === null ? <LoadingBox /> : <ListView tasks={archived} onOpen={(t) => handleOpen(t.id)} />)}
           {view === 'pessoas' && (
@@ -292,6 +303,7 @@ export function Workspace({ user }: { user: ClientPrincipal }) {
           users={users}
           currentUser={user}
           origin={openOrigin}
+          onUpdateProgress={openProgress}
           onClose={() => setOpenId(null)}
           onEdit={() => {
             setForm({ mode: 'edit', task: openTask });
@@ -326,6 +338,14 @@ export function Workspace({ user }: { user: ClientPrincipal }) {
           users={users}
           onConfirm={confirmHomologador}
           onClose={() => setHomologAction(null)}
+        />
+      )}
+
+      {progressTask && (
+        <ProgressUpdateModal
+          task={progressTask}
+          onClose={() => setProgressTask(null)}
+          notify={flash}
         />
       )}
 

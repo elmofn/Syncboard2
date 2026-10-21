@@ -854,6 +854,48 @@
   font-size: var(--sb-fs-meta);
   font-weight: 700;
 }
+/* "Atualizar" no bloco de progresso do detalhe */
+.detail-block__edit {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border: 1px solid var(--sb-border-strong);
+  border-radius: var(--sb-radius-control);
+  background: var(--sb-panel);
+  color: var(--sb-action);
+  font-size: var(--sb-fs-meta);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background var(--sb-motion) ease, border-color var(--sb-motion) ease;
+}
+.detail-block__edit:hover {
+  border-color: var(--sb-action);
+  background: color-mix(in srgb, var(--sb-action) 8%, var(--sb-panel));
+}
+
+/* Barra de progresso do card vira botão (abre o modal de progresso) */
+.task-card__progress-btn {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  border-radius: var(--sb-radius-control);
+}
+.task-card__progress-btn:hover .progress__fill {
+  filter: brightness(1.08);
+}
+
+/* Modal de progresso: % centralizado e destacado */
+.progress-modal__pct {
+  text-align: center;
+  font-size: var(--sb-fs-subtitle);
+  font-weight: 800;
+}
 
 .tabs {
   display: flex;

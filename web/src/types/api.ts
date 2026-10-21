@@ -56,6 +56,7 @@ export interface Task {
   status: TaskStatus;
   priority: string;
   progress?: number; // 0–100 (barra "Progresso")
+  missingToComplete?: string; // pendência informada quando progress < 100
   project: string;
   projectColor: string;
   azureLink?: string;
