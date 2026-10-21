@@ -1,6 +1,6 @@
 import type { ComponentType } from 'react';
 import type { IconProps } from '@phosphor-icons/react';
-import { ArrowRight, ArrowUpRight, Check, Circle, Diamond, Pause } from '@phosphor-icons/react';
+import { CheckCircle, MagnifyingGlass, PauseCircle, Rocket, Spinner, Tray } from '@phosphor-icons/react';
 import type { TaskStatus } from '../types/api';
 
 export interface StatusMeta {
@@ -12,12 +12,12 @@ export interface StatusMeta {
 }
 
 export const STATUS_META: Record<TaskStatus, StatusMeta> = {
-  todo: { key: 'todo', label: 'Fila', icon: Circle, colorVar: 'todo' },
-  stopped: { key: 'stopped', label: 'Parado', icon: Pause, colorVar: 'stopped' },
-  inprogress: { key: 'inprogress', label: 'Andamento', icon: ArrowRight, colorVar: 'inprogress' },
-  homologation: { key: 'homologation', label: 'Homologação', icon: Diamond, colorVar: 'homologation' },
-  publication: { key: 'publication', label: 'Publicação', icon: ArrowUpRight, colorVar: 'publication' },
-  done: { key: 'done', label: 'Concluída', icon: Check, colorVar: 'todo' },
+  todo: { key: 'todo', label: 'Fila', icon: Tray, colorVar: 'todo' },
+  stopped: { key: 'stopped', label: 'Parado', icon: PauseCircle, colorVar: 'stopped' },
+  inprogress: { key: 'inprogress', label: 'Andamento', icon: Spinner, colorVar: 'inprogress' },
+  homologation: { key: 'homologation', label: 'Homologação', icon: MagnifyingGlass, colorVar: 'homologation' },
+  publication: { key: 'publication', label: 'Publicação', icon: Rocket, colorVar: 'publication' },
+  done: { key: 'done', label: 'Concluída', icon: CheckCircle, colorVar: 'todo' },
 };
 
 /** Colunas do quadro (done = arquivada, fora do board). */

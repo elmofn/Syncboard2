@@ -129,7 +129,7 @@ export function Board({ tasks, moveTask, reorderTask, onOpen, notify }: Props) {
             onDrop={(e) => onDrop(e, status)}
           >
             <header className="board-column__head">
-              <StatusIcon aria-hidden="true" />
+              <StatusIcon weight="light" aria-hidden="true" />
               <h2>{STATUS_META[status].label}</h2>
               <span className="board-column__count sb-meta">{all.length}</span>
             </header>
