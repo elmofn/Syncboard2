@@ -3,6 +3,7 @@ import type { Task, TaskStatus } from '../types/api';
 import { api } from '../lib/api';
 import { connectRealtime } from '../lib/realtime';
 import { shouldIgnoreTaskUpdate } from '../lib/reconcile';
+import { play } from '../lib/sound';
 
 export function useTasks() {
   const [tasks, setTasks] = useState<Task[] | null>(null);
@@ -45,6 +46,7 @@ export function useTasks() {
     const current = tasksRef.current.find((t) => t.id === id);
     if (!current || current.status === status) return;
     const prevStatus = current.status;
+    play('move'); // feedback ao mover o card de coluna
     setTasks((prev) => prev?.map((t) => (t.id === id ? { ...t, status, ...extra } : t)) ?? prev);
     try {
       await api.updateTask(id, {
@@ -55,6 +57,7 @@ export function useTasks() {
       });
     } catch (e) {
       // desfaz em caso de erro/conflito
+      play('error');
       setTasks((prev) => prev?.map((t) => (t.id === id ? { ...t, status: prevStatus } : t)) ?? prev);
       setError(e instanceof Error ? e.message : 'Falha ao mover a tarefa.');
     }
@@ -63,6 +66,8 @@ export function useTasks() {
   /** Reordena (e opcionalmente move de coluna) definindo um novo `order`. */
   const reorderTask = useCallback(
     async (id: string, status: TaskStatus, order: number, prevStatus?: TaskStatus, etag?: string, extra?: Record<string, unknown>) => {
+      const changedColumn = !!prevStatus && prevStatus !== status;
+      if (changedColumn) play('move'); // feedback ao mover o card de coluna
       setTasks((prev) => prev?.map((t) => (t.id === id ? { ...t, status, order, ...extra } : t)) ?? prev);
       try {
         const patch: Record<string, unknown> = { order, ...extra };
@@ -73,6 +78,7 @@ export function useTasks() {
         }
         await api.updateTask(id, patch);
       } catch (e) {
+        if (changedColumn) play('error');
         setError(e instanceof Error ? e.message : 'Falha ao reordenar.');
         load();
       }
