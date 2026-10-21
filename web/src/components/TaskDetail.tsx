@@ -195,6 +195,7 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify, 
     }
     void run(async () => {
       await api.editComment(task.id, commentId, html, authorEmail);
+      play('send'); // mesmo som de novo comentário
       setEditingId(null);
     }, 'Falha ao editar o comentário.');
   };
@@ -487,7 +488,19 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify, 
               </li>
             </ul>
 
-            <ProgressBar value={task.progress ?? 0} label />
+            {onUpdateProgress && task.status !== 'homologation' ? (
+              <button
+                type="button"
+                className="summary__progress-btn"
+                title="Atualizar progresso"
+                aria-label="Atualizar progresso"
+                onClick={() => onUpdateProgress(task)}
+              >
+                <ProgressBar value={task.progress ?? 0} label />
+              </button>
+            ) : (
+              <ProgressBar value={task.progress ?? 0} label />
+            )}
 
             <div className="summary__actions">
               {isHomolog ? (

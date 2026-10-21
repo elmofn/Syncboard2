@@ -876,7 +876,8 @@
 }
 
 /* Barra de progresso do card vira botão (abre o modal de progresso) */
-.task-card__progress-btn {
+.task-card__progress-btn,
+.summary__progress-btn {
   display: block;
   width: 100%;
   padding: 0;
@@ -886,9 +887,11 @@
   cursor: pointer;
   border-radius: var(--sb-radius-control);
 }
-.task-card__progress-btn:hover .progress__fill {
+.task-card__progress-btn:hover .progress__fill,
+.summary__progress-btn:hover .progress__fill {
   filter: brightness(1.08);
 }
+.summary__progress-btn { margin: 0; }
 
 /* Modal de progresso: % centralizado e destacado */
 .progress-modal__pct {
@@ -1079,7 +1082,8 @@
 .editor {
   border: 1px solid var(--sb-border-strong);
   border-radius: var(--sb-radius-control);
-  overflow: hidden;
+  /* visible para o menu de menção flutuar acima sem recorte */
+  overflow: visible;
   position: relative;
 }
 .editor__toolbar {
@@ -1088,6 +1092,7 @@
   padding: var(--sb-sp-2);
   border-bottom: 1px solid var(--sb-panel-border);
   background: color-mix(in srgb, var(--sb-panel) 70%, var(--sb-bg));
+  border-radius: var(--sb-radius-control) var(--sb-radius-control) 0 0;
 }
 .editor__toolbar button {
   width: 28px;
@@ -1945,15 +1950,16 @@
 }
 .mention-menu {
   position: absolute;
-  left: var(--sb-sp-2);
-  right: var(--sb-sp-2);
-  bottom: 56px;
+  left: 0;
+  right: 0;
+  /* flutua logo acima do editor, fora do campo de texto */
+  bottom: calc(100% + 6px);
   background: var(--sb-panel);
   border: 1px solid var(--sb-panel-border);
   border-radius: var(--sb-radius-card);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-  z-index: 30;
-  max-height: 180px;
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.22);
+  z-index: 60;
+  max-height: 240px;
   overflow: auto;
   display: flex;
   flex-direction: column;
