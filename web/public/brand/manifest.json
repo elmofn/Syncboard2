@@ -1,0 +1,24 @@
+{
+  "version": 2,
+  "direction": "Fluxo",
+  "source_archive": "SyncboardNT-Kit-Visual-TC443-v2.zip",
+  "source_sha256": "15de4adc74dadb15730b5b1bec2eb1daecfb9aa11f7a2ab49a9cd713814b9a72",
+  "assets": {
+    "README.md": "e02f31e21b78b603a5a2a4c50f54bfb82163f0308f2901b7ba33297583b6d8b2",
+    "brand-tokens.json": "9e7601ad70d6e08acfa6cbfb950e6829e038c1c8a14a960b78f029dd98eb3a10",
+    "favicon.svg": "1ec842d558895ae4b02541c9554a6fc0474becac33e3196369b13e34cf4c5d80",
+    "logo-primary-dark.svg": "365fc680e60741818f4cf88e2be6471666e34db121a120df69c6da848ed9eb0f",
+    "logo-primary-light.svg": "652ceb2c52e3bbfca343f831cac4c59e6769d5a61aefd8d860c4373fdf4d7b55",
+    "logo-primary-mono-dark.svg": "250af48cecb97d202563a91c1f07a3b0074772777f2be4d8eee796c2393aeb92",
+    "logo-primary-mono-light.svg": "bdc05269830712a1474a283a01cc97cf5d6de35f65c02e53e627b40ca9a7cab5",
+    "mark-primary-light.svg": "889fd8b6044d350f23d78f3b28258054b67abed3da6cce8ab034f959c4cb69f0",
+    "mark-primary-mono-dark.svg": "7e2b268559d6767a449534d8bd83e98bc3dbc3b803895676547a51e2369ca630",
+    "mark-primary-mono.svg": "d79528991e9f3e9008ce7ffd4bdbd771fa34c94a4a1f1627c76fd58f8a6f7fcc",
+    "mark-primary.svg": "889fd8b6044d350f23d78f3b28258054b67abed3da6cce8ab034f959c4cb69f0",
+    "mark-small-mono-dark.svg": "53892eddcf27b17c205e6d3111caddd5835dbc0311e57bf4914e36d683153411",
+    "mark-small-mono.svg": "5987d97f6616b7948d209ddc7ad5291b382ce20489b1505a9a577302e2f6b5e2",
+    "mark-small.svg": "1ec842d558895ae4b02541c9554a6fc0474becac33e3196369b13e34cf4c5d80"
+  },
+  "revision": "tc496-syncboard",
+  "wordmark": "SyncBOARD"
+}

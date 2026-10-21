@@ -8,7 +8,7 @@ export function Login() {
       <ThemeToggle className="login__theme" />
       <aside className="login__brand">
         <img className="login__logo" src="/brand/logo-primary-dark.svg" alt="SyncBOARD" height={48} />
-        <img className="login__cube" src="/brand/mark-primary.svg" alt="" width={180} height={180} />
+        <img className="login__cube" src="/brand/cube-assembly-512.gif" alt="" width={260} height={260} draggable={false} />
         <h1 className="login__headline">
           Seu trabalho.
           <br />
