@@ -3,6 +3,16 @@ import type { ClientPrincipal } from '../types/api';
 import { mockCurrentPrincipal } from './mock/fixtures';
 
 const MOCK_KEY = 'sb-mock-logged-in';
+/** Marca que a entrada veio de um login agora (consumido pelo splash de entrada). */
+export const ENTERING_KEY = 'sb-entering';
+
+function markEntering(): void {
+  try {
+    sessionStorage.setItem(ENTERING_KEY, '1');
+  } catch {
+    /* ignore */
+  }
+}
 
 /** Retorna o usuário autenticado (ou null). */
 export async function getUserInfo(): Promise<ClientPrincipal | null> {
@@ -25,6 +35,7 @@ export async function getUserInfo(): Promise<ClientPrincipal | null> {
 
 /** Inicia o login. Em mock, marca a sessão local; em live, vai para o Google. */
 export function login(): void {
+  markEntering();
   if (IS_MOCK) {
     try {
       localStorage.setItem(MOCK_KEY, '1');
