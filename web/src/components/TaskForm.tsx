@@ -129,21 +129,21 @@ export function TaskForm({ mode, task, users, onClose, notify }: Props) {
           <div className="modal__left form">
             <label className="field">
               <span className="sb-label">Título <small className="sb-meta">(obrigatório)</small></span>
-              <input className="sb-input" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Digite o título da tarefa…" />
+              <input className="sb-input form__title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Digite o título da tarefa…" />
             </label>
-            <button type="button" className="sb-button sb-button--secondary ai-btn" onClick={() => setAiOpen(true)} disabled={!title.trim()}>
+            <button type="button" className="sb-button ai-btn" onClick={() => setAiOpen(true)} disabled={!title.trim()}>
               ✨ Melhorar título com IA
             </button>
 
-            <label className="field">
+            <label className="field form__sep">
               <span className="sb-label">Descrição <small className="sb-meta">(obrigatória)</small></span>
               <textarea className="sb-textarea form__desc" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Descreva os detalhes e requisitos da tarefa…" />
             </label>
 
-            <div className="field">
+            <div className="field form__sep">
               <div className="form__attach-head">
-                <span className="sb-label">Anexos</span>
-                <button type="button" className="sb-button sb-button--secondary" onClick={() => fileRef.current?.click()}>+ Adicionar</button>
+                <span className="sb-label sb-label--section">📎 Anexos</span>
+                <button type="button" className="sb-button ai-btn form__add" onClick={() => fileRef.current?.click()}>+ Adicionar</button>
                 <input ref={fileRef} type="file" multiple hidden onChange={(e) => onPickFiles(e.target.files)} />
               </div>
               {attachments.length === 0 ? (
@@ -172,8 +172,8 @@ export function TaskForm({ mode, task, users, onClose, notify }: Props) {
               <small className="sb-meta">Referência externa opcional.</small>
             </label>
 
-            <div className="field">
-              <span className="sb-label">Responsáveis</span>
+            <div className="field form__sep">
+              <span className="sb-label">👥 Responsáveis</span>
               <div className="chips">
                 {responsible.map((r, i) => (
                   <span key={r.email || i} className="chip-person">
@@ -192,7 +192,7 @@ export function TaskForm({ mode, task, users, onClose, notify }: Props) {
             </div>
 
             <label className="field">
-              <span className="sb-label">Homologador <small className="sb-meta">(opcional)</small></span>
+              <span className="sb-label">🛡️ Homologador <small className="sb-meta">(opcional)</small></span>
               <select className="sb-select" value={homologador} onChange={(e) => setHomologador(e.target.value)}>
                 <option value="">Definir depois</option>
                 {users.filter((u) => u.email).map((u) => (
@@ -204,7 +204,7 @@ export function TaskForm({ mode, task, users, onClose, notify }: Props) {
 
             {isEdit && (
               <label className="field">
-                <span className="sb-label">Status</span>
+                <span className="sb-label">📊 Status</span>
                 <select className="sb-select" value={status} onChange={(e) => setStatus(e.target.value as typeof status)}>
                   {BOARD_COLUMNS.map((s) => (
                     <option key={s} value={s}>{STATUS_META[s].label}</option>
@@ -214,7 +214,7 @@ export function TaskForm({ mode, task, users, onClose, notify }: Props) {
             )}
 
             <div className="field">
-              <span className="sb-label">Projeto</span>
+              <span className="sb-label">📁 Projeto</span>
               <div className="form__project">
                 <input className="sb-input" value={project} onChange={(e) => setProject(e.target.value)} placeholder="Projeto" />
                 <input type="color" className="form__color" value={projectColor} onChange={(e) => setProjectColor(e.target.value)} aria-label="Cor do projeto" />
@@ -222,7 +222,7 @@ export function TaskForm({ mode, task, users, onClose, notify }: Props) {
             </div>
 
             <label className="field">
-              <span className="sb-label">Prioridade</span>
+              <span className="sb-label">🚩 Prioridade</span>
               <select className="sb-select" value={priority} onChange={(e) => setPriority(e.target.value)}>
                 {PRIORITIES.map((p) => (
                   <option key={p} value={p}>{p}</option>
@@ -232,7 +232,7 @@ export function TaskForm({ mode, task, users, onClose, notify }: Props) {
 
             <div className="field">
               <div className="form__prazo-head">
-                <span className="sb-label">Prazo</span>
+                <span className="sb-label">📅 Prazo</span>
                 <label className="sb-meta form__nodate">
                   <input type="checkbox" checked={noDate} onChange={(e) => setNoDate(e.target.checked)} /> Sem data
                 </label>

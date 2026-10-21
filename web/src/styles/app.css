@@ -1050,8 +1050,39 @@
 .form .sb-label small {
   font-weight: 400;
 }
+.form__title {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+.form__title::placeholder {
+  font-weight: 800;
+  color: color-mix(in srgb, var(--sb-muted) 55%, transparent);
+}
+/* Botões com o tom de ação (Melhorar com IA / + Adicionar) */
 .ai-btn {
   align-self: flex-start;
+  background: color-mix(in srgb, var(--sb-action) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--sb-action) 24%, transparent);
+  color: var(--sb-action);
+}
+.ai-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--sb-action) 16%, transparent);
+}
+.form__add { align-self: auto; }
+/* Linha divisória entre seções do formulário */
+.form__sep {
+  border-top: 1px solid var(--sb-panel-border);
+  padding-top: var(--sb-sp-4);
+  margin-top: var(--sb-sp-1);
+}
+/* Rótulo de seção em caixa alta (ex.: Anexos) */
+.sb-label--section {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: var(--sb-fs-meta);
 }
 .form__desc {
   min-height: 140px;
