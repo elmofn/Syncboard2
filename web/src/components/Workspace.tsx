@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { PersonResolverContext, makePersonResolver } from '../lib/people';
 import type { ClientPrincipal, Notification, ProjectCount, Task, TaskStatus, User } from '../types/api';
 import { personEmail } from '../types/api';
 import { ListBullets, SquaresFour } from '@phosphor-icons/react';
@@ -193,7 +194,10 @@ export function Workspace({ user }: { user: ClientPrincipal }) {
     api.markNotificationRead(id).catch(() => undefined);
   };
 
+  const resolvePerson = useMemo(() => makePersonResolver(users), [users]);
+
   return (
+    <PersonResolverContext.Provider value={resolvePerson}>
     <div className="workspace">
       <Sidebar
         user={user}
@@ -331,6 +335,7 @@ export function Workspace({ user }: { user: ClientPrincipal }) {
         </div>
       )}
     </div>
+    </PersonResolverContext.Provider>
   );
 }
 

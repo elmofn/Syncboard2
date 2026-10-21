@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef, useState } from 'react';
-import type { Task, User, ClientPrincipal, PersonRef, Attachment, Person } from '../types/api';
+import type { Task, User, ClientPrincipal, PersonRef, Attachment } from '../types/api';
 import { personName, personEmail } from '../types/api';
+import { usePersonResolver } from '../lib/people';
 import { api } from '../lib/api';
 import { useEscape } from '../lib/useEscape';
 import { play } from '../lib/sound';
@@ -121,17 +122,8 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify, 
     return (!!email && email === myEmail) || personName(author) === myName;
   };
 
-  // Enriquece uma referência (muitas vezes só um e-mail) com nome/foto do
-  // cadastro de usuários, para o avatar e o nome aparecerem corretos.
-  const resolvePerson = (ref: PersonRef): Person => {
-    const email = personEmail(ref).toLowerCase();
-    const u = email ? users.find((x) => x.email.toLowerCase() === email) : undefined;
-    return {
-      email: personEmail(ref),
-      name: u?.name || personName(ref),
-      picture: u?.picture || (typeof ref === 'object' ? ref.picture : undefined),
-    };
-  };
+  // Resolve pessoa (nome/foto) pelo cadastro de usuários, chaveado por e-mail.
+  const resolvePerson = usePersonResolver();
 
   const run = async (fn: () => Promise<unknown>, errMsg: string) => {
     setBusy(true);
