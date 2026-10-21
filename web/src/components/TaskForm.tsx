@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import type { Task, User, Attachment, Person } from '../types/api';
-import { personName } from '../types/api';
+import { personName, personEmail } from '../types/api';
 import { api } from '../lib/api';
 import { useEscape } from '../lib/useEscape';
 import { play } from '../lib/sound';
@@ -29,6 +29,7 @@ export function TaskForm({ mode, task, users, onClose, notify }: Props) {
   const [description, setDescription] = useState(task?.description ?? '');
   const [azureLink, setAzureLink] = useState(task?.azureLink ?? '');
   const [responsible, setResponsible] = useState<Person[]>(toPersons(task?.responsible));
+  const [homologador, setHomologador] = useState(personEmail(task?.homologador));
   const [status, setStatus] = useState(task?.status ?? 'todo');
   const [project, setProject] = useState(task?.project ?? '');
   const [projectColor, setProjectColor] = useState(task?.projectColor || DEFAULT_COLOR);
@@ -66,6 +67,11 @@ export function TaskForm({ mode, task, users, onClose, notify }: Props) {
       return;
     }
     const resolvedDue = noDate ? null : dueDate || null;
+    const homologadorRef = (() => {
+      if (!homologador) return null;
+      const u = users.find((x) => x.email === homologador);
+      return u ? { email: u.email, name: u.name } : null;
+    })();
     setSaving(true);
     try {
       if (isEdit && task) {
@@ -74,6 +80,7 @@ export function TaskForm({ mode, task, users, onClose, notify }: Props) {
           description: description.trim(),
           azureLink,
           responsible,
+          homologador: homologadorRef,
           status,
           project,
           projectColor,
@@ -88,6 +95,7 @@ export function TaskForm({ mode, task, users, onClose, notify }: Props) {
           title: title.trim(),
           description: description.trim(),
           responsible,
+          homologador: homologadorRef,
           azureLink,
           project,
           projectColor,
@@ -121,7 +129,7 @@ export function TaskForm({ mode, task, users, onClose, notify }: Props) {
           <div className="modal__left form">
             <label className="field">
               <span className="sb-label">Título <small className="sb-meta">(obrigatório)</small></span>
-              <input className="sb-input" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Título da tarefa" />
+              <input className="sb-input" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Digite o título da tarefa…" />
             </label>
             <button type="button" className="sb-button sb-button--secondary ai-btn" onClick={() => setAiOpen(true)} disabled={!title.trim()}>
               ✨ Melhorar título com IA
@@ -129,7 +137,7 @@ export function TaskForm({ mode, task, users, onClose, notify }: Props) {
 
             <label className="field">
               <span className="sb-label">Descrição <small className="sb-meta">(obrigatória)</small></span>
-              <textarea className="sb-textarea form__desc" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Descreva o escopo da tarefa" />
+              <textarea className="sb-textarea form__desc" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Descreva os detalhes e requisitos da tarefa…" />
             </label>
 
             <div className="field">
@@ -139,7 +147,7 @@ export function TaskForm({ mode, task, users, onClose, notify }: Props) {
                 <input ref={fileRef} type="file" multiple hidden onChange={(e) => onPickFiles(e.target.files)} />
               </div>
               {attachments.length === 0 ? (
-                <p className="sb-meta">Nenhum anexo.</p>
+                <p className="sb-meta">Ao salvar, o sistema tentará enviar os arquivos selecionados. Um arquivo com link não confirma que as alterações foram salvas.</p>
               ) : (
                 <ul className="attachments">
                   {attachments.map((a, i) => (
@@ -161,6 +169,7 @@ export function TaskForm({ mode, task, users, onClose, notify }: Props) {
             <label className="field">
               <span className="sb-label">Link DevOps / externo</span>
               <input className="sb-input" value={azureLink} onChange={(e) => setAzureLink(e.target.value)} placeholder="Link DevOps / Externo…" />
+              <small className="sb-meta">Referência externa opcional.</small>
             </label>
 
             <div className="field">
@@ -179,8 +188,19 @@ export function TaskForm({ mode, task, users, onClose, notify }: Props) {
                   <option key={u.email} value={u.email}>{u.name}</option>
                 ))}
               </select>
-              <small className="sb-meta">A primeira é a responsável principal.</small>
+              <small className="sb-meta">Adicione uma ou mais pessoas. A primeira é a responsável principal.</small>
             </div>
+
+            <label className="field">
+              <span className="sb-label">Homologador <small className="sb-meta">(opcional)</small></span>
+              <select className="sb-select" value={homologador} onChange={(e) => setHomologador(e.target.value)}>
+                <option value="">Definir depois</option>
+                {users.filter((u) => u.email).map((u) => (
+                  <option key={u.email} value={u.email}>{u.name}</option>
+                ))}
+              </select>
+              <small className="sb-meta">Você pode definir agora ou depois. A escolha será confirmada ao enviar para Homologação.</small>
+            </label>
 
             {isEdit && (
               <label className="field">
