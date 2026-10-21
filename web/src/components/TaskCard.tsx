@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type DragEvent } from 'react';
 import type { Task } from '../types/api';
 import { api } from '../lib/api';
 import { play } from '../lib/sound';
@@ -9,12 +9,13 @@ import { TaskFlowMini } from './TaskFlowMini';
 
 interface Props {
   task: Task;
-  onDragStart: (id: string) => void;
+  onDragStart: (id: string, e: DragEvent<HTMLElement>) => void;
+  onDragEnd?: () => void;
   onOpen?: (task: Task) => void;
   notify?: (msg: string) => void;
 }
 
-export function TaskCard({ task, onDragStart, onOpen, notify }: Props) {
+export function TaskCard({ task, onDragStart, onDragEnd, onOpen, notify }: Props) {
   const hasAlert = Array.isArray(task.pendingAlerts) && task.pendingAlerts.length > 0;
   const comments = Array.isArray(task.comments) ? task.comments.length : 0;
   const isHomolog = task.status === 'homologation';
@@ -63,7 +64,8 @@ export function TaskCard({ task, onDragStart, onOpen, notify }: Props) {
     <article
       className="sb-card task-card"
       draggable
-      onDragStart={() => onDragStart(task.id)}
+      onDragStart={(e) => onDragStart(task.id, e)}
+      onDragEnd={onDragEnd}
       onClick={() => onOpen?.(task)}
     >
       <div className="task-card__top">

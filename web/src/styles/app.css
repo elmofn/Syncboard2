@@ -2172,13 +2172,48 @@
   to { opacity: 1; transform: none; }
 }
 
-/* Destaque da coluna ao arrastar */
+/* Arrastar: estados do quadro */
+.board.is-dragging,
+.board.is-dragging .task-card {
+  cursor: grabbing;
+}
+.board.is-dragging .board-column {
+  transition: opacity 0.16s ease;
+}
+.board.is-dragging .board-column:not(.is-drop) {
+  opacity: 0.85;
+}
+.task-card:active {
+  transform: scale(0.985);
+}
+
+/* Destaque da coluna-alvo ao arrastar */
 .board-column.is-drop {
-  background: color-mix(in srgb, var(--sb-action) 7%, transparent);
+  background: color-mix(in srgb, var(--sb-action) 6%, transparent);
   border-radius: var(--sb-radius-panel);
-  outline: 2px dashed color-mix(in srgb, var(--sb-action) 50%, var(--sb-panel-border));
-  outline-offset: 2px;
-  transition: background 0.12s ease;
+  transition: background 0.14s ease;
+}
+
+/* Silhueta (placeholder) de onde o card vai cair */
+.card-placeholder {
+  border: 2px dashed color-mix(in srgb, var(--sb-action) 55%, var(--sb-panel-border));
+  border-radius: var(--sb-radius-card);
+  background: color-mix(in srgb, var(--sb-action) 9%, transparent);
+  transform-origin: top center;
+  animation: sb-ph-in 0.16s cubic-bezier(0.2, 0.8, 0.2, 1) both,
+    sb-ph-pulse 1.5s ease-in-out 0.16s infinite;
+}
+@keyframes sb-ph-in {
+  from { opacity: 0; transform: scaleY(0.5); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes sb-ph-pulse {
+  0%, 100% { border-color: color-mix(in srgb, var(--sb-action) 45%, var(--sb-panel-border)); background: color-mix(in srgb, var(--sb-action) 7%, transparent); }
+  50% { border-color: color-mix(in srgb, var(--sb-action) 85%, var(--sb-panel-border)); background: color-mix(in srgb, var(--sb-action) 13%, transparent); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card-placeholder { animation: none; }
+  .task-card:active { transform: none; }
 }
 
 /* Barra de progresso animada */
