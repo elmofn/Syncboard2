@@ -2156,6 +2156,30 @@
 .card-menu__list,
 .notif,
 .mention-menu { animation: sb-pop 0.16s ease both; }
+
+/* Detalhe da tarefa: abre/fecha a partir do ponto exato do clique (origin
+   fixado em JS). Substitui o pop genérico por uma transição ancorada. */
+.modal-overlay--origin {
+  animation: none;
+  transition: opacity 0.22s ease;
+}
+.modal-overlay--origin.is-enter,
+.modal-overlay--origin.is-exit { opacity: 0; }
+.modal-overlay--origin.is-open { opacity: 1; }
+.modal--origin {
+  animation: none;
+  will-change: transform, opacity;
+  transition: transform 0.24s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.22s ease;
+}
+.modal--origin.is-enter,
+.modal--origin.is-exit {
+  opacity: 0;
+  transform: scale(0.14);
+}
+.modal--origin.is-open {
+  opacity: 1;
+  transform: none;
+}
 .workspace__notice { animation: sb-slide-down 0.26s ease both; }
 .workspace__toast { animation: sb-toast-in 0.26s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
 @keyframes sb-toast-in {

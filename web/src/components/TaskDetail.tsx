@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import type { Task, User, ClientPrincipal, PersonRef, Attachment } from '../types/api';
 import { personName } from '../types/api';
 import { api } from '../lib/api';
@@ -24,7 +24,11 @@ interface Props {
   onClose: () => void;
   onEdit: () => void;
   notify: (msg: string) => void;
+  /** Ponto do clique (viewport) que abriu a tarefa; a tarefa abre a partir dele. */
+  origin?: { x: number; y: number } | null;
 }
+
+const ANIM_MS = 240;
 
 function Html({ html, className }: { html: string; className?: string }) {
   // Conteúdo vindo do backend/mock. Sanitização entra na fase de endurecimento.
@@ -43,8 +47,45 @@ const HISTORY_ICON: Record<string, ComponentType<IconProps>> = {
   edited: PencilSimple,
 };
 
-export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify }: Props) {
+export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify, origin }: Props) {
   const [tab, setTab] = useState<Tab>('comentarios');
+  const modalRef = useRef<HTMLDivElement>(null);
+  const [phase, setPhase] = useState<'enter' | 'open' | 'exit'>('enter');
+  const closingRef = useRef(false);
+
+  // Abertura ancorada no ponto do clique: mede a caixa real (sem transform),
+  // fixa o transform-origin no ponto clicado e então reproduz a transição.
+  useLayoutEffect(() => {
+    const el = modalRef.current;
+    if (!el) return;
+    const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    if (origin && !reduced) {
+      const prev = el.style.transform;
+      el.style.transform = 'none';
+      const r = el.getBoundingClientRect();
+      el.style.transform = prev;
+      const ox = Math.max(0, Math.min(origin.x - r.left, r.width));
+      const oy = Math.max(0, Math.min(origin.y - r.top, r.height));
+      el.style.transformOrigin = `${ox}px ${oy}px`;
+    }
+    const id = requestAnimationFrame(() => setPhase('open'));
+    return () => cancelAnimationFrame(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Fecha com a animação reversa (fade/scale de volta ao ponto de abertura).
+  const requestClose = (after: () => void) => {
+    if (closingRef.current) return;
+    closingRef.current = true;
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+      after();
+      return;
+    }
+    setPhase('exit');
+    window.setTimeout(after, ANIM_MS);
+  };
+  const close = () => requestClose(onClose);
+  const edit = () => requestClose(onEdit);
   const [forwardOpen, setForwardOpen] = useState(false);
   const [forwardTo, setForwardTo] = useState('');
   const [forwardNote, setForwardNote] = useState('');
@@ -53,7 +94,7 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify }
   const editRef = useRef<HTMLDivElement>(null);
   const [attnOpen, setAttnOpen] = useState(false);
   const attachRef = useRef<HTMLInputElement>(null);
-  useEscape(onClose);
+  useEscape(close);
   const confirm = useConfirm();
 
   const responsibles = Array.isArray(task.responsible) ? task.responsible : [];
@@ -191,14 +232,14 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify }
   const alerts = Array.isArray(task.pendingAlerts) ? task.pendingAlerts : [];
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal" role="dialog" aria-modal="true" aria-label={`Tarefa ${task.id}`} onClick={(e) => e.stopPropagation()}>
+    <div className={`modal-overlay modal-overlay--origin is-${phase}`} onClick={close}>
+      <div ref={modalRef} className={`modal modal--origin is-${phase}`} role="dialog" aria-modal="true" aria-label={`Tarefa ${task.id}`} onClick={(e) => e.stopPropagation()}>
         <header className="modal__head">
           <div className="sb-row">
             <span className="modal__chip">#{task.id}</span>
             <StatusBadge status={task.status} />
           </div>
-          <button type="button" className="modal__close" onClick={onClose} aria-label="Fechar" autoFocus><X /></button>
+          <button type="button" className="modal__close" onClick={close} aria-label="Fechar" autoFocus><X /></button>
         </header>
 
         <div className="modal__body">
@@ -460,8 +501,8 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify }
         <footer className="modal__foot">
           <span className="sb-meta">Alterações e comentários usam as ações desta tarefa.</span>
           <div className="sb-row">
-            <button type="button" className="sb-button sb-button--secondary" onClick={onClose}><X /> Fechar</button>
-            <button type="button" className="sb-button" onClick={onEdit}><PencilSimple /> Editar tarefa</button>
+            <button type="button" className="sb-button sb-button--secondary" onClick={close}><X /> Fechar</button>
+            <button type="button" className="sb-button" onClick={edit}><PencilSimple /> Editar tarefa</button>
           </div>
         </footer>
       </div>

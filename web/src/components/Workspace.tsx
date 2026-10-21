@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ClientPrincipal, Notification, ProjectCount, Task, TaskStatus, User } from '../types/api';
 import { personEmail } from '../types/api';
 import { ListBullets, SquaresFour } from '@phosphor-icons/react';
@@ -39,6 +39,18 @@ export function Workspace({ user }: { user: ClientPrincipal }) {
   const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS);
   const [notice, setNotice] = useState<string | null>(null);
   const [openId, setOpenId] = useState<string | null>(null);
+  const [openOrigin, setOpenOrigin] = useState<{ x: number; y: number } | null>(null);
+  // Último ponto de clique: a tarefa abre a partir dele (sensação de surgir do cartão).
+  const lastPointer = useRef<{ x: number; y: number } | null>(null);
+  useEffect(() => {
+    const onDown = (e: PointerEvent) => { lastPointer.current = { x: e.clientX, y: e.clientY }; };
+    window.addEventListener('pointerdown', onDown, true);
+    return () => window.removeEventListener('pointerdown', onDown, true);
+  }, []);
+  const handleOpen = (id: string) => {
+    setOpenOrigin(lastPointer.current);
+    setOpenId(id);
+  };
   const [form, setForm] = useState<{ mode: 'create' } | { mode: 'edit'; task: Task } | null>(null);
   const [navOpen, setNavOpen] = useState(false);
   const [homologAction, setHomologAction] = useState<
@@ -108,6 +120,7 @@ export function Workspace({ user }: { user: ClientPrincipal }) {
     setAckingAlert(true);
     try {
       await api.dismissAlert(activeAlert.taskId, activeAlert.etag);
+      setOpenOrigin(null);
       setOpenId(activeAlert.taskId);
     } catch {
       flash('Falha ao confirmar o alerta.');
@@ -194,7 +207,7 @@ export function Workspace({ user }: { user: ClientPrincipal }) {
           crumb={VIEW_LABEL[view]}
           notifications={notifications}
           onMarkRead={markNotification}
-          onOpenTask={(taskId) => setOpenId(taskId)}
+          onOpenTask={(taskId) => handleOpen(taskId)}
           onToggleSidebar={() => setNavOpen((v) => !v)}
         />
 
@@ -242,9 +255,9 @@ export function Workspace({ user }: { user: ClientPrincipal }) {
           {error && <div className="workspace__notice workspace__notice--error">{error}</div>}
 
           {view === 'quadro' &&
-            (tasks === null ? <LoadingBox /> : <Board tasks={filtered} moveTask={handleMove} reorderTask={handleReorder} onOpen={(t) => setOpenId(t.id)} notify={flash} />)}
-          {view === 'lista' && (tasks === null ? <LoadingBox /> : <ListView tasks={filtered} onOpen={(t) => setOpenId(t.id)} />)}
-          {view === 'arquivados' && (archived === null ? <LoadingBox /> : <ListView tasks={archived} onOpen={(t) => setOpenId(t.id)} />)}
+            (tasks === null ? <LoadingBox /> : <Board tasks={filtered} moveTask={handleMove} reorderTask={handleReorder} onOpen={(t) => handleOpen(t.id)} notify={flash} />)}
+          {view === 'lista' && (tasks === null ? <LoadingBox /> : <ListView tasks={filtered} onOpen={(t) => handleOpen(t.id)} />)}
+          {view === 'arquivados' && (archived === null ? <LoadingBox /> : <ListView tasks={archived} onOpen={(t) => handleOpen(t.id)} />)}
           {view === 'pessoas' && (
             <PeopleView
               users={users}
@@ -254,15 +267,17 @@ export function Workspace({ user }: { user: ClientPrincipal }) {
               notify={flash}
             />
           )}
-          {view === 'home' && (tasks === null ? <LoadingBox /> : <HomeView tasks={activeTasks} user={user} onOpen={(t) => setOpenId(t.id)} onGoHomologacao={goHomologacao} />)}
+          {view === 'home' && (tasks === null ? <LoadingBox /> : <HomeView tasks={activeTasks} user={user} onOpen={(t) => handleOpen(t.id)} onGoHomologacao={goHomologacao} />)}
         </div>
       </div>
 
       {openTask && (
         <TaskDetail
+          key={openTask.id}
           task={openTask}
           users={users}
           currentUser={user}
+          origin={openOrigin}
           onClose={() => setOpenId(null)}
           onEdit={() => {
             setForm({ mode: 'edit', task: openTask });
