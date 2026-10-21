@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { User } from '../types/api';
 import { api } from '../lib/api';
+import { play } from '../lib/sound';
 import { Avatar } from './Avatar';
 import { UserForm } from './UserForm';
 
@@ -24,8 +25,10 @@ export function PeopleView({ users, canManage, currentEmail, onChanged, notify }
     if (!window.confirm(`Excluir o usuário ${u.displayName || u.name}?`)) return;
     try {
       await api.deleteUser(u.id);
+      play('move');
       onChanged();
     } catch (e) {
+      play('error');
       notify(e instanceof Error ? e.message : 'Falha ao excluir o usuário.');
     }
   };

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { User } from '../types/api';
 import { api } from '../lib/api';
 import { useEscape } from '../lib/useEscape';
+import { play } from '../lib/sound';
 
 interface Props {
   mode: 'create' | 'edit';
@@ -31,9 +32,11 @@ export function UserForm({ mode, user, onClose, onSaved, notify }: Props) {
       const payload = { email: email.trim(), displayName: displayName.trim(), role, isAdmin, isAiAgent };
       if (isEdit && user) await api.updateUser(user.id, payload);
       else await api.addUser(payload);
+      play('success');
       onSaved();
       onClose();
     } catch (e) {
+      play('error');
       notify(e instanceof Error ? e.message : 'Falha ao salvar o utilizador.');
     } finally {
       setSaving(false);

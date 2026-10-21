@@ -3,6 +3,8 @@ import { useState } from 'react';
 // Feedback sonoro sutil, sintetizado via Web Audio (sem arquivos). Sons curtos
 // e suaves, disparados em ações do usuário (respeitando um mute persistido).
 const KEY = 'sb-sound';
+// Multiplicador de volume global do feedback sonoro.
+const MASTER = 1.5;
 let ctx: AudioContext | null = null;
 
 function getCtx(): AudioContext | null {
@@ -49,8 +51,9 @@ function tone(audio: AudioContext, { f, t, d, type = 'sine', g = 0.05 }: Note) {
   osc.connect(gain);
   gain.connect(audio.destination);
   const start = audio.currentTime + t;
+  const peak = Math.min(g * MASTER, 0.9);
   gain.gain.setValueAtTime(0.0001, start);
-  gain.gain.linearRampToValueAtTime(g, start + 0.012);
+  gain.gain.linearRampToValueAtTime(peak, start + 0.012);
   gain.gain.exponentialRampToValueAtTime(0.0001, start + d);
   osc.start(start);
   osc.stop(start + d + 0.03);

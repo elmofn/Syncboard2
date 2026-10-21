@@ -130,8 +130,6 @@ export function Workspace({ user }: { user: ClientPrincipal }) {
             onNewTask={showFilters || view === 'home' ? () => setForm({ mode: 'create' }) : undefined}
           />
 
-          {notice && <div className="workspace__notice">{notice}</div>}
-
           {showFilters && (
             <>
               <FilterBar
@@ -207,6 +205,12 @@ export function Workspace({ user }: { user: ClientPrincipal }) {
           onClose={() => setForm(null)}
           notify={flash}
         />
+      )}
+
+      {notice && (
+        <div className="workspace__toast" role="status" aria-live="polite">
+          {notice}
+        </div>
       )}
     </div>
   );

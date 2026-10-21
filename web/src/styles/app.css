@@ -345,6 +345,21 @@
   background: var(--sb-status-error-bg);
   color: var(--sb-status-error-fg);
 }
+/* Toast flutuante: fica visível acima de qualquer modal (z-index > overlay). */
+.workspace__toast {
+  position: fixed;
+  left: 50%;
+  bottom: var(--sb-sp-5);
+  transform: translateX(-50%);
+  z-index: 100;
+  max-width: min(520px, calc(100vw - 32px));
+  background: var(--sb-ink);
+  color: #fff;
+  border-radius: var(--sb-radius-control);
+  padding: var(--sb-sp-3) var(--sb-sp-4);
+  font-size: var(--sb-fs-control);
+  box-shadow: 0 10px 30px rgba(17, 24, 39, 0.28);
+}
 
 /* ---------- Sidebar ---------- */
 .sidebar {
@@ -1824,6 +1839,11 @@
 .notif,
 .mention-menu { animation: sb-pop 0.16s ease both; }
 .workspace__notice { animation: sb-slide-down 0.26s ease both; }
+.workspace__toast { animation: sb-toast-in 0.26s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes sb-toast-in {
+  from { opacity: 0; transform: translate(-50%, 12px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
 @keyframes sb-fade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes sb-pop {
   from { opacity: 0; transform: translateY(10px) scale(0.985); }

@@ -123,6 +123,7 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify }
       await api.signalResponsible(task.id, attnTargets);
       play('notify');
       setAttnOpen(false);
+      notify('Responsáveis sinalizados.');
     }, 'Falha ao chamar atenção.');
   };
 
