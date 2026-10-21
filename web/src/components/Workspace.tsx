@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import type { ClientPrincipal, Notification, ProjectCount, Task, User } from '../types/api';
+import type { ClientPrincipal, Notification, ProjectCount, Task, TaskStatus, User } from '../types/api';
+import { personEmail } from '../types/api';
 import { api } from '../lib/api';
 import { useTasks } from '../hooks/useTasks';
 import { EMPTY_FILTERS, filterTasks, type Filters } from '../lib/filter';
@@ -15,6 +16,9 @@ import { TaskDetail } from './TaskDetail';
 import { TaskForm } from './TaskForm';
 import { PeopleView } from './PeopleView';
 import { HomeView } from './HomeView';
+import { HomologadorModal } from './HomologadorModal';
+import { AlertModal, type IncomingAlert } from './AlertModal';
+import { play } from '../lib/sound';
 
 const HEADER: Record<View, { title: string; subtitle: string }> = {
   home: { title: 'Home', subtitle: 'Um resumo do seu trabalho.' },
@@ -36,9 +40,79 @@ export function Workspace({ user }: { user: ClientPrincipal }) {
   const [openId, setOpenId] = useState<string | null>(null);
   const [form, setForm] = useState<{ mode: 'create' } | { mode: 'edit'; task: Task } | null>(null);
   const [navOpen, setNavOpen] = useState(false);
+  const [homologAction, setHomologAction] = useState<
+    | { type: 'move'; id: string }
+    | { type: 'reorder'; id: string; order: number; prevStatus: TaskStatus; etag?: string }
+    | null
+  >(null);
   const go = (v: View) => {
     setView(v);
     setNavOpen(false);
+  };
+
+  // Ao mover para Homologação sem homologador definido, pede quem vai homologar.
+  const needsHomologador = (id: string) => {
+    const t = (tasks ?? []).find((x) => x.id === id);
+    return !!t && !personEmail(t.homologador);
+  };
+  const handleMove = (id: string, status: TaskStatus) => {
+    if (status === 'homologation' && needsHomologador(id)) {
+      setHomologAction({ type: 'move', id });
+      return;
+    }
+    moveTask(id, status);
+  };
+  const handleReorder = (id: string, status: TaskStatus, order: number, prevStatus?: TaskStatus, etag?: string) => {
+    if (status === 'homologation' && prevStatus && prevStatus !== status && needsHomologador(id)) {
+      setHomologAction({ type: 'reorder', id, order, prevStatus, etag });
+      return;
+    }
+    reorderTask(id, status, order, prevStatus, etag);
+  };
+  const confirmHomologador = (person: { email: string; name: string }) => {
+    const a = homologAction;
+    if (!a) return;
+    setHomologAction(null);
+    if (a.type === 'move') moveTask(a.id, 'homologation', { homologador: person });
+    else reorderTask(a.id, 'homologation', a.order, a.prevStatus, a.etag, { homologador: person });
+  };
+
+  // Alertas de "Atenção Solicitada" direcionados a mim, exibidos um a um.
+  const [skippedAlerts, setSkippedAlerts] = useState<Set<string>>(new Set());
+  const [ackingAlert, setAckingAlert] = useState(false);
+  const myName = user.claims?.find((c) => c.typ === 'name')?.val || user.userDetails;
+  const myEmail = user.userDetails.toLowerCase();
+  const incomingAlerts = useMemo<IncomingAlert[]>(() => {
+    const list: IncomingAlert[] = [];
+    for (const t of tasks ?? []) {
+      for (const a of t.pendingAlerts ?? []) {
+        if (a.acknowledgedAt) continue;
+        if (a.targetUser === myName || a.targetUser.toLowerCase() === myEmail) {
+          list.push({ key: `${t.id}|${a.timestamp}`, taskId: t.id, taskTitle: t.title, signaledBy: a.signaledBy, etag: t._etag });
+        }
+      }
+    }
+    return list;
+  }, [tasks, myName, myEmail]);
+  const pendingAlerts = incomingAlerts.filter((a) => !skippedAlerts.has(a.key));
+  const activeAlert = pendingAlerts[0];
+
+  useEffect(() => {
+    if (activeAlert) play('notify');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeAlert?.key]);
+
+  const ackAlert = async () => {
+    if (!activeAlert) return;
+    setAckingAlert(true);
+    try {
+      await api.dismissAlert(activeAlert.taskId, activeAlert.etag);
+      setOpenId(activeAlert.taskId);
+    } catch {
+      flash('Falha ao confirmar o alerta.');
+    } finally {
+      setAckingAlert(false);
+    }
   };
 
   const reloadUsers = () => api.getUsers().then(setUsers).catch(() => undefined);
@@ -167,7 +241,7 @@ export function Workspace({ user }: { user: ClientPrincipal }) {
           {error && <div className="workspace__notice workspace__notice--error">{error}</div>}
 
           {view === 'quadro' &&
-            (tasks === null ? <LoadingBox /> : <Board tasks={filtered} moveTask={moveTask} reorderTask={reorderTask} onOpen={(t) => setOpenId(t.id)} notify={flash} />)}
+            (tasks === null ? <LoadingBox /> : <Board tasks={filtered} moveTask={handleMove} reorderTask={handleReorder} onOpen={(t) => setOpenId(t.id)} notify={flash} />)}
           {view === 'lista' && (tasks === null ? <LoadingBox /> : <ListView tasks={filtered} onOpen={(t) => setOpenId(t.id)} />)}
           {view === 'arquivados' && (archived === null ? <LoadingBox /> : <ListView tasks={archived} onOpen={(t) => setOpenId(t.id)} />)}
           {view === 'pessoas' && (
@@ -204,6 +278,24 @@ export function Workspace({ user }: { user: ClientPrincipal }) {
           users={users}
           onClose={() => setForm(null)}
           notify={flash}
+        />
+      )}
+
+      {activeAlert && (
+        <AlertModal
+          alert={activeAlert}
+          queueCount={pendingAlerts.length - 1}
+          busy={ackingAlert}
+          onAck={ackAlert}
+          onSkip={() => setSkippedAlerts((prev) => new Set(prev).add(activeAlert.key))}
+        />
+      )}
+
+      {homologAction && (
+        <HomologadorModal
+          users={users}
+          onConfirm={confirmHomologador}
+          onClose={() => setHomologAction(null)}
         />
       )}
 

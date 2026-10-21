@@ -5,6 +5,7 @@ import { api } from '../lib/api';
 import { useEscape } from '../lib/useEscape';
 import { play } from '../lib/sound';
 import { BOARD_COLUMNS, STATUS_META } from '../lib/status';
+import { AiTitleModal } from './AiTitleModal';
 
 const PRIORITIES = ['Baixa', 'Média', 'Alta'];
 const DEFAULT_COLOR = '#526D82';
@@ -35,7 +36,7 @@ export function TaskForm({ mode, task, users, onClose, notify }: Props) {
   const [noDate, setNoDate] = useState(!task?.dueDate);
   const [dueDate, setDueDate] = useState(task?.dueDate ?? '');
   const [attachments, setAttachments] = useState<Attachment[]>(task?.attachments ?? []);
-  const [improving, setImproving] = useState(false);
+  const [aiOpen, setAiOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   useEscape(onClose);
@@ -44,19 +45,6 @@ export function TaskForm({ mode, task, users, onClose, notify }: Props) {
     const u = users.find((x) => x.email === email);
     if (!u || responsible.some((r) => r.email === u.email)) return;
     setResponsible((prev) => [...prev, { email: u.email, name: u.name }]);
-  };
-
-  const improve = async () => {
-    if (!title.trim()) return;
-    setImproving(true);
-    try {
-      const { title: improved } = await api.improveTitle(title.trim());
-      setTitle(improved);
-    } catch {
-      notify('Falha ao melhorar o título.');
-    } finally {
-      setImproving(false);
-    }
   };
 
   const onPickFiles = async (files: FileList | null) => {
@@ -135,8 +123,8 @@ export function TaskForm({ mode, task, users, onClose, notify }: Props) {
               <span className="sb-label">Título <small className="sb-meta">(obrigatório)</small></span>
               <input className="sb-input" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Título da tarefa" />
             </label>
-            <button type="button" className="sb-button sb-button--secondary ai-btn" onClick={improve} disabled={improving || !title.trim()}>
-              ✨ {improving ? 'Melhorando…' : 'Melhorar título com IA'}
+            <button type="button" className="sb-button sb-button--secondary ai-btn" onClick={() => setAiOpen(true)} disabled={!title.trim()}>
+              ✨ Melhorar título com IA
             </button>
 
             <label className="field">
@@ -242,6 +230,14 @@ export function TaskForm({ mode, task, users, onClose, notify }: Props) {
           </div>
         </footer>
       </div>
+
+      {aiOpen && (
+        <AiTitleModal
+          original={title}
+          onApply={(t) => setTitle(t)}
+          onClose={() => setAiOpen(false)}
+        />
+      )}
     </div>
   );
 }

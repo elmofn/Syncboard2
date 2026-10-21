@@ -236,10 +236,13 @@ export const mockApi: ApiClient = {
     return clone(task);
   },
 
-  async improveTitle(currentTitle: string) {
+  async improveTitle(currentTitle: string, userInstruction?: string) {
     await delay(300);
     const clean = currentTitle.trim().replace(/\s+/g, ' ');
-    return { title: clean ? `${clean[0].toUpperCase()}${clean.slice(1)} — versão clara (mock)` : clean };
+    if (!clean) return { title: clean };
+    const base = `${clean[0].toUpperCase()}${clean.slice(1)}`;
+    const hint = userInstruction?.trim();
+    return { title: hint ? `${base} — ${hint} (mock)` : `${base} — versão clara (mock)` };
   },
 
   async uploadAttachment(file: File) {

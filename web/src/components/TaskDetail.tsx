@@ -10,6 +10,7 @@ import { StatusBadge } from './StatusBadge';
 import { ProgressBar } from './ProgressBar';
 import { CommentEditor } from './CommentEditor';
 import { useConfirm } from './ConfirmDialog';
+import { SignalModal } from './SignalModal';
 
 type Tab = 'comentarios' | 'anexos' | 'historico';
 
@@ -48,7 +49,6 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify }
   const [editingId, setEditingId] = useState<string | null>(null);
   const editRef = useRef<HTMLDivElement>(null);
   const [attnOpen, setAttnOpen] = useState(false);
-  const [attnTargets, setAttnTargets] = useState<string[]>([]);
   const attachRef = useRef<HTMLInputElement>(null);
   useEscape(onClose);
   const confirm = useConfirm();
@@ -107,22 +107,21 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify }
     }, 'Falha ao encaminhar.');
   };
 
-  const toggleAttn = () => {
+  const openAttn = () => {
     const names = responsibles.map(personName).filter(Boolean);
     if (names.length === 0) {
       notify('Não há responsáveis para sinalizar.');
       return;
     }
-    setAttnTargets(names);
-    setAttnOpen((v) => !v);
+    setAttnOpen(true);
   };
-  const confirmAttn = () => {
-    if (attnTargets.length === 0) {
+  const confirmAttn = (targets: string[]) => {
+    if (targets.length === 0) {
       notify('Selecione ao menos um responsável.');
       return;
     }
     void run(async () => {
-      await api.signalResponsible(task.id, attnTargets);
+      await api.signalResponsible(task.id, targets);
       play('notify');
       setAttnOpen(false);
       notify('Responsáveis sinalizados.');
@@ -439,27 +438,7 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify }
                   )}
                 </>
               ) : (
-                <>
-                  <button type="button" className="sb-button sb-button--secondary" disabled={busy} onClick={toggleAttn}>📣 Chamar atenção</button>
-                  {attnOpen && (
-                    <div className="forward-form">
-                      {responsibles.map((r) => {
-                        const nm = personName(r);
-                        return (
-                          <label key={nm} className="checkline">
-                            <input
-                              type="checkbox"
-                              checked={attnTargets.includes(nm)}
-                              onChange={(e) => setAttnTargets((prev) => (e.target.checked ? [...prev, nm] : prev.filter((x) => x !== nm)))}
-                            />{' '}
-                            {nm}
-                          </label>
-                        );
-                      })}
-                      <button type="button" className="sb-button" disabled={busy} onClick={confirmAttn}>Sinalizar</button>
-                    </div>
-                  )}
-                </>
+                <button type="button" className="sb-button sb-button--secondary" disabled={busy} onClick={openAttn}>📣 Chamar atenção</button>
               )}
               {myAlert && (
                 <button type="button" className="sb-button" disabled={busy} onClick={dismiss}>👀 Vou olhar</button>
@@ -477,6 +456,15 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify }
           </div>
         </footer>
       </div>
+
+      {attnOpen && (
+        <SignalModal
+          responsibles={responsibles}
+          busy={busy}
+          onConfirm={confirmAttn}
+          onClose={() => setAttnOpen(false)}
+        />
+      )}
     </div>
   );
 

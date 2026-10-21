@@ -38,14 +38,15 @@ export function useTasks() {
   }, [load]);
 
   /** Move uma tarefa de coluna (muda o status) com atualização otimista. */
-  const moveTask = useCallback(async (id: string, status: TaskStatus) => {
+  const moveTask = useCallback(async (id: string, status: TaskStatus, extra?: Record<string, unknown>) => {
     const current = tasksRef.current.find((t) => t.id === id);
     if (!current || current.status === status) return;
     const prevStatus = current.status;
-    setTasks((prev) => prev?.map((t) => (t.id === id ? { ...t, status } : t)) ?? prev);
+    setTasks((prev) => prev?.map((t) => (t.id === id ? { ...t, status, ...extra } : t)) ?? prev);
     try {
       await api.updateTask(id, {
         status,
+        ...extra,
         expectedStatus: prevStatus,
         expectedEtag: current._etag,
       });
@@ -58,10 +59,10 @@ export function useTasks() {
 
   /** Reordena (e opcionalmente move de coluna) definindo um novo `order`. */
   const reorderTask = useCallback(
-    async (id: string, status: TaskStatus, order: number, prevStatus?: TaskStatus, etag?: string) => {
-      setTasks((prev) => prev?.map((t) => (t.id === id ? { ...t, status, order } : t)) ?? prev);
+    async (id: string, status: TaskStatus, order: number, prevStatus?: TaskStatus, etag?: string, extra?: Record<string, unknown>) => {
+      setTasks((prev) => prev?.map((t) => (t.id === id ? { ...t, status, order, ...extra } : t)) ?? prev);
       try {
-        const patch: Record<string, unknown> = { order };
+        const patch: Record<string, unknown> = { order, ...extra };
         if (prevStatus && prevStatus !== status) {
           patch.status = status;
           patch.expectedStatus = prevStatus;
