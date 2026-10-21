@@ -2163,6 +2163,7 @@
   animation: none;
   transition: opacity 0.22s ease;
 }
+.modal-overlay--origin.is-pre,
 .modal-overlay--origin.is-enter,
 .modal-overlay--origin.is-exit { opacity: 0; }
 .modal-overlay--origin.is-open { opacity: 1; }
@@ -2170,6 +2171,11 @@
   animation: none;
   will-change: transform, opacity;
   transition: transform 0.24s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.22s ease;
+}
+/* 'pre': tamanho real, invisível — usado só para medir o ponto de abertura. */
+.modal--origin.is-pre {
+  opacity: 0;
+  transform: none;
 }
 .modal--origin.is-enter,
 .modal--origin.is-exit {

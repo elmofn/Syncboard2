@@ -50,26 +50,33 @@ const HISTORY_ICON: Record<string, ComponentType<IconProps>> = {
 export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify, origin }: Props) {
   const [tab, setTab] = useState<Tab>('comentarios');
   const modalRef = useRef<HTMLDivElement>(null);
-  const [phase, setPhase] = useState<'enter' | 'open' | 'exit'>('enter');
+  // 'pre' = caixa em tamanho real (sem transform) só para medir; 'enter' = ponto
+  // de partida reduzido; 'open' = aberto; 'exit' = recolhendo ao fechar.
+  const [phase, setPhase] = useState<'pre' | 'enter' | 'open' | 'exit'>('pre');
   const closingRef = useRef(false);
 
-  // Abertura ancorada no ponto do clique: mede a caixa real (sem transform),
-  // fixa o transform-origin no ponto clicado e então reproduz a transição.
+  // Abertura ancorada no ponto do clique: mede a caixa REAL enquanto ainda não
+  // há transform (fase 'pre'), fixa o transform-origin no ponto clicado e então
+  // reproduz a transição 'enter' → 'open'.
   useLayoutEffect(() => {
     const el = modalRef.current;
     if (!el) return;
-    const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-    if (origin && !reduced) {
-      const prev = el.style.transform;
-      el.style.transform = 'none';
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+      setPhase('open');
+      return;
+    }
+    if (origin) {
       const r = el.getBoundingClientRect();
-      el.style.transform = prev;
       const ox = Math.max(0, Math.min(origin.x - r.left, r.width));
       const oy = Math.max(0, Math.min(origin.y - r.top, r.height));
       el.style.transformOrigin = `${ox}px ${oy}px`;
     }
-    const id = requestAnimationFrame(() => setPhase('open'));
-    return () => cancelAnimationFrame(id);
+    setPhase('enter');
+    let raf2 = 0;
+    const raf1 = requestAnimationFrame(() => {
+      raf2 = requestAnimationFrame(() => setPhase('open'));
+    });
+    return () => { cancelAnimationFrame(raf1); cancelAnimationFrame(raf2); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
