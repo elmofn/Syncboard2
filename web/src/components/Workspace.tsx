@@ -130,10 +130,15 @@ export function Workspace({ user }: { user: ClientPrincipal }) {
   };
 
   const reloadUsers = () => api.getUsers().then(setUsers).catch(() => undefined);
+  const reloadNotifications = () => api.getNotifications().then(setNotifications).catch(() => undefined);
 
   useEffect(() => {
     reloadUsers();
-    api.getNotifications().then(setNotifications).catch(() => undefined);
+    reloadNotifications();
+    // Reconcilia o badge ao voltar o foco (ex.: após um intervalo offline).
+    const onFocus = () => reloadNotifications();
+    window.addEventListener('focus', onFocus);
+    return () => window.removeEventListener('focus', onFocus);
   }, []);
 
   // Recarrega contagens de projeto quando a lista de tarefas muda.

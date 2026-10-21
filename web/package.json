@@ -6,7 +6,9 @@
   "description": "Frontend do Syncboard (React + Vite + TypeScript). Reconstrução sobre o contrato de API existente.",
   "scripts": {
     "dev": "vite",
+    "dev:live": "VITE_MODE=live vite",
     "build": "tsc --noEmit && vite build",
+    "build:live": "tsc --noEmit && VITE_MODE=live vite build",
     "preview": "vite preview",
     "lint": "tsc --noEmit"
   },

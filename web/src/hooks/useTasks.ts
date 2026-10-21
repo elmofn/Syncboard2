@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Task, TaskStatus } from '../types/api';
 import { api } from '../lib/api';
 import { connectRealtime } from '../lib/realtime';
+import { shouldIgnoreTaskUpdate } from '../lib/reconcile';
 
 export function useTasks() {
   const [tasks, setTasks] = useState<Task[] | null>(null);
@@ -26,9 +27,10 @@ export function useTasks() {
       taskUpdated: (t) =>
         setTasks((prev) => {
           if (!prev) return prev;
-          const next = prev.some((x) => x.id === t.id)
-            ? prev.map((x) => (x.id === t.id ? t : x))
-            : [...prev, t];
+          const current = prev.find((x) => x.id === t.id);
+          // TC495: não deixa um update atrasado desfazer um estágio já commitado.
+          if (current && shouldIgnoreTaskUpdate(current, t)) return prev;
+          const next = current ? prev.map((x) => (x.id === t.id ? t : x)) : [...prev, t];
           return next.filter((x) => x.status !== 'done');
         }),
       taskDeleted: (id) => setTasks((prev) => prev?.filter((x) => x.id !== id) ?? prev),
