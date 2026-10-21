@@ -80,7 +80,7 @@ export function Sidebar({ user, view, onNavigate, projects, activeCount, activeP
       </nav>
 
       <div className="sidebar__user">
-        <Avatar person={{ email: user.userDetails, name }} small />
+        <Avatar person={{ email: user.userDetails, name, picture: user.claims?.find((c) => c.typ === 'picture')?.val }} small />
         <span className="sidebar__user-info">
           <strong>{name}</strong>
           <small>{user.claims?.find((c) => c.typ === 'role')?.val || 'Membro'}</small>

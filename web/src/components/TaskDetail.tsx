@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef, useState } from 'react';
-import type { Task, User, ClientPrincipal, PersonRef, Attachment } from '../types/api';
-import { personName } from '../types/api';
+import type { Task, User, ClientPrincipal, PersonRef, Attachment, Person } from '../types/api';
+import { personName, personEmail } from '../types/api';
 import { api } from '../lib/api';
 import { useEscape } from '../lib/useEscape';
 import { play } from '../lib/sound';
@@ -116,9 +116,21 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify, 
     (a) => (a.targetUser === myName || a.targetUser.toLowerCase() === myEmail) && !a.acknowledgedAt,
   );
   const canEditComment = (author: PersonRef) => {
-    const email = (typeof author === 'object' ? author.email : '').toLowerCase();
-    const name = typeof author === 'object' ? author.name : author;
-    return email === myEmail || name === myName;
+    // Em live o autor é o e-mail (string); casa por e-mail OU por nome de exibição.
+    const email = personEmail(author).toLowerCase();
+    return (!!email && email === myEmail) || personName(author) === myName;
+  };
+
+  // Enriquece uma referência (muitas vezes só um e-mail) com nome/foto do
+  // cadastro de usuários, para o avatar e o nome aparecerem corretos.
+  const resolvePerson = (ref: PersonRef): Person => {
+    const email = personEmail(ref).toLowerCase();
+    const u = email ? users.find((x) => x.email.toLowerCase() === email) : undefined;
+    return {
+      email: personEmail(ref),
+      name: u?.name || personName(ref),
+      picture: u?.picture || (typeof ref === 'object' ? ref.picture : undefined),
+    };
   };
 
   const run = async (fn: () => Promise<unknown>, errMsg: string) => {
@@ -300,10 +312,10 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify, 
                       const cAtts = Array.isArray(c.attachments) ? c.attachments : [];
                       return (
                         <li key={c.id} className="comment">
-                          <Avatar person={typeof c.author === 'object' ? c.author : { email: '', name: String(c.author) }} small />
+                          <Avatar person={resolvePerson(c.author as PersonRef)} small />
                           <div className="comment__main">
                             <div className="comment__who">
-                              <strong>{personName(c.author as PersonRef)}</strong>
+                              <strong>{resolvePerson(c.author as PersonRef).name}</strong>
                               <small className="sb-meta">{fmt(c.timestamp)}{c.editedAt ? ' · editado' : ''}</small>
                             </div>
                             {isEditing ? (
@@ -433,7 +445,7 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify, 
             <h2 className="summary__flow-title">Fluxo</h2>
             <ul className="flow">
               <li className="flow__item">
-                {flow.requester ? <Avatar person={flow.requester} small /> : <span className="flow__placeholder">NR</span>}
+                {flow.requester ? <Avatar person={resolvePerson(flow.requester)} small /> : <span className="flow__placeholder">NR</span>}
                 <div>
                   <strong>{flow.requester?.name || 'Não registrado'}</strong>
                   <div className="sb-meta">Solicitante{flow.requester && task.createdAt ? ` · ${fmt(task.createdAt)}` : ''}</div>
@@ -451,7 +463,7 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify, 
                       const alert = alerts.find((a) => a.targetUser === p.name || a.targetUser === p.email);
                       return (
                         <div key={p.email || j} className="flow__person">
-                          <Avatar person={p} small />
+                          <Avatar person={resolvePerson(p)} small />
                           <div>
                             <strong>{p.name}</strong>
                             <div className="sb-meta">{role}{step.at ? ` · ${fmt(step.at)}` : ''}</div>
@@ -465,7 +477,7 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify, 
               })}
 
               <li className="flow__item">
-                {flow.homologador ? <Avatar person={flow.homologador} small /> : <span className="flow__placeholder">NI</span>}
+                {flow.homologador ? <Avatar person={resolvePerson(flow.homologador)} small /> : <span className="flow__placeholder">NI</span>}
                 <div>
                   <strong>{flow.homologador?.name || 'Não informado'}</strong>
                   <div className="sb-meta">Homologador</div>

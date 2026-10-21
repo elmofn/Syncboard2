@@ -55,7 +55,7 @@ export function TopBar({ user, crumb, notifications, onMarkRead, onOpenTask, onT
             />
           )}
         </div>
-        <Avatar person={{ email: user.userDetails, name }} small />
+        <Avatar person={{ email: user.userDetails, name, picture: user.claims?.find((c) => c.typ === 'picture')?.val }} small />
       </div>
     </div>
   );

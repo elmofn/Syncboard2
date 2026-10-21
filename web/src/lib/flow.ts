@@ -17,13 +17,17 @@ export interface TaskFlow {
 function toPersons(value: unknown): Person[] {
   if (!Array.isArray(value)) return [];
   return value
-    .map((r) => (typeof r === 'object' && r ? { email: (r as Person).email, name: (r as Person).name } : { email: '', name: String(r) }))
+    .map((r) =>
+      typeof r === 'object' && r
+        ? { email: (r as Person).email, name: (r as Person).name, picture: (r as Person).picture }
+        : { email: '', name: String(r) },
+    )
     .filter((p) => p.name || p.email);
 }
 
 function toPerson(ref: PersonRef | null | undefined): Person | null {
   if (!ref) return null;
-  return typeof ref === 'object' ? { email: ref.email, name: ref.name } : { email: '', name: ref };
+  return typeof ref === 'object' ? { email: ref.email, name: ref.name, picture: ref.picture } : { email: '', name: ref };
 }
 
 interface AssignmentEntry {
@@ -38,7 +42,9 @@ interface AssignmentEntry {
  * (quando há responsáveis simultâneos, aparecem agrupados).
  */
 export function buildTaskFlow(task: Task): TaskFlow {
-  const requester = task.requester ? { email: task.requester.email, name: task.requester.name } : null;
+  const requester = task.requester
+    ? { email: task.requester.email, name: task.requester.name, picture: (task.requester as { picture?: string }).picture }
+    : null;
   const homologador = toPerson(task.homologador);
   const ah = (Array.isArray(task.assignmentHistory) ? task.assignmentHistory : []) as AssignmentEntry[];
 
