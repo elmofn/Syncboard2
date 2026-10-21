@@ -2196,20 +2196,21 @@
 
 /* Silhueta (placeholder) de onde o card vai cair */
 .card-placeholder {
-  border: 2px dashed color-mix(in srgb, var(--sb-action) 55%, var(--sb-panel-border));
+  border: 1.5px dashed color-mix(in srgb, var(--sb-action) 50%, var(--sb-panel-border));
   border-radius: var(--sb-radius-card);
-  background: color-mix(in srgb, var(--sb-action) 9%, transparent);
+  background: color-mix(in srgb, var(--sb-action) 8%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sb-action) 10%, transparent);
   transform-origin: top center;
-  animation: sb-ph-in 0.16s cubic-bezier(0.2, 0.8, 0.2, 1) both,
-    sb-ph-pulse 1.5s ease-in-out 0.16s infinite;
+  animation: sb-ph-in 0.2s cubic-bezier(0.2, 0.8, 0.2, 1) both,
+    sb-ph-pulse 1.8s ease-in-out 0.2s infinite;
 }
 @keyframes sb-ph-in {
-  from { opacity: 0; transform: scaleY(0.5); }
+  from { opacity: 0; transform: scaleY(0.6); }
   to { opacity: 1; transform: none; }
 }
 @keyframes sb-ph-pulse {
-  0%, 100% { border-color: color-mix(in srgb, var(--sb-action) 45%, var(--sb-panel-border)); background: color-mix(in srgb, var(--sb-action) 7%, transparent); }
-  50% { border-color: color-mix(in srgb, var(--sb-action) 85%, var(--sb-panel-border)); background: color-mix(in srgb, var(--sb-action) 13%, transparent); }
+  0%, 100% { border-color: color-mix(in srgb, var(--sb-action) 42%, var(--sb-panel-border)); background: color-mix(in srgb, var(--sb-action) 7%, transparent); }
+  50% { border-color: color-mix(in srgb, var(--sb-action) 68%, var(--sb-panel-border)); background: color-mix(in srgb, var(--sb-action) 11%, transparent); }
 }
 @media (prefers-reduced-motion: reduce) {
   .card-placeholder { animation: none; }

@@ -1,6 +1,7 @@
 import { Fragment, useRef, useState, type CSSProperties, type DragEvent } from 'react';
 import type { Task, TaskStatus } from '../types/api';
 import { BOARD_COLUMNS, STATUS_META } from '../lib/status';
+import { useFlip } from '../lib/useFlip';
 import { TaskCard } from './TaskCard';
 
 interface Props {
@@ -108,8 +109,10 @@ export function Board({ tasks, moveTask, reorderTask, onOpen, notify }: Props) {
     <div className="card-placeholder" style={{ height: dragH }} aria-hidden="true" />
   );
 
+  const boardRef = useFlip<HTMLDivElement>();
+
   return (
-    <div className={`board${dragId ? ' is-dragging' : ''}`}>
+    <div ref={boardRef} className={`board${dragId ? ' is-dragging' : ''}`}>
       {BOARD_COLUMNS.map((status) => {
         const all = columnCards(status);
         const visible = dragId ? all.filter((t) => t.id !== dragId) : all;
@@ -134,7 +137,7 @@ export function Board({ tasks, moveTask, reorderTask, onOpen, notify }: Props) {
               {visible.map((task, i) => (
                 <Fragment key={task.id}>
                   {phIndex === i && <Placeholder />}
-                  <div onDragOver={(e) => onCardDragOver(e, status, i)} onDrop={(e) => onDrop(e, status)}>
+                  <div data-flip={task.id} onDragOver={(e) => onCardDragOver(e, status, i)} onDrop={(e) => onDrop(e, status)}>
                     <TaskCard task={task} onDragStart={onDragStart} onDragEnd={reset} onOpen={onOpen} notify={notify} />
                   </div>
                 </Fragment>
