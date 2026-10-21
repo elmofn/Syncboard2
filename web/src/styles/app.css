@@ -1519,17 +1519,24 @@
 .homolog-modal__icon {
   width: 64px;
   height: 64px;
-  margin: 0 auto var(--sb-sp-4);
+  margin: 0 auto var(--sb-sp-5);
   display: grid;
   place-items: center;
   font-size: 28px;
   border-radius: 999px;
   background: color-mix(in srgb, var(--sb-status-homologation-fg) 16%, transparent);
 }
-.homolog-modal__title { font-size: 18px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: var(--sb-sp-2); }
-.homolog-modal__help { color: var(--sb-muted); font-size: var(--sb-fs-control); line-height: 1.5; margin-bottom: var(--sb-sp-4); }
-.homolog-modal__field { text-align: left; margin-bottom: var(--sb-sp-5); }
+.homolog-modal__title { font-size: 18px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: var(--sb-sp-3); }
+.homolog-modal__help { color: var(--sb-muted); font-size: var(--sb-fs-control); line-height: 1.55; margin-bottom: var(--sb-sp-6); }
+.homolog-modal__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sb-sp-2);
+  text-align: left;
+  margin-bottom: var(--sb-sp-6);
+}
 .homolog-modal__actions { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sb-sp-3); }
+.homolog-modal__actions .sb-button { justify-content: center; padding-block: 10px; }
 .homolog-modal__actions .sb-button { justify-content: center; }
 
 /* Modal "Atenção Solicitada" (alerta recebido) */
