@@ -1259,6 +1259,52 @@
 .modal--sm {
   width: min(520px, 100%);
 }
+
+/* Diálogo de confirmação (reutilizável) */
+.confirm-overlay { z-index: 70; }
+.confirm {
+  width: min(420px, calc(100vw - 32px));
+  background: var(--sb-panel);
+  border: 1px solid var(--sb-panel-border);
+  border-radius: var(--sb-radius-panel);
+  padding: var(--sb-sp-6);
+  text-align: center;
+  box-shadow: 0 24px 60px rgba(17, 24, 39, 0.3);
+  animation: sb-pop 0.22s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.confirm__icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto var(--sb-sp-4);
+  display: grid;
+  place-items: center;
+  font-size: 28px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--sb-action) 12%, transparent);
+}
+.confirm__icon--danger {
+  background: color-mix(in srgb, var(--sb-status-error-fg) 14%, transparent);
+}
+.confirm__title {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: var(--sb-sp-2);
+}
+.confirm__message {
+  color: var(--sb-muted);
+  font-size: var(--sb-fs-control);
+  line-height: 1.5;
+  margin-bottom: var(--sb-sp-5);
+}
+.confirm__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sb-sp-3);
+}
+.confirm__actions .sb-button {
+  justify-content: center;
+}
 .modal__single {
   padding: var(--sb-sp-5);
   display: flex;

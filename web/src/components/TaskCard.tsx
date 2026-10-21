@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { Task } from '../types/api';
 import { api } from '../lib/api';
 import { play } from '../lib/sound';
+import { useConfirm } from './ConfirmDialog';
 import { ProgressBar } from './ProgressBar';
 import { TaskFlowMini } from './TaskFlowMini';
 
@@ -18,6 +19,7 @@ export function TaskCard({ task, onDragStart, onOpen, notify }: Props) {
   const isHomolog = task.status === 'homologation';
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const confirm = useConfirm();
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -44,9 +46,15 @@ export function TaskCard({ task, onDragStart, onOpen, notify }: Props) {
       play(action === 'approve' ? 'success' : 'move');
     }, 'Falha na decisão de homologação.');
 
-  const del = () => {
+  const del = async () => {
     setMenuOpen(false);
-    if (!window.confirm(`Excluir a tarefa ${task.id}? Esta ação não pode ser desfeita.`)) return;
+    const ok = await confirm({
+      title: 'Excluir tarefa?',
+      message: `A tarefa ${task.id} será removida permanentemente do quadro. Esta ação não pode ser desfeita.`,
+      confirmLabel: 'Sim, remover',
+      danger: true,
+    });
+    if (!ok) return;
     void act(() => api.deleteTask(task.id), 'Falha ao excluir a tarefa.');
   };
 

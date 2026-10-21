@@ -4,6 +4,7 @@ import { api } from '../lib/api';
 import { play } from '../lib/sound';
 import { Avatar } from './Avatar';
 import { UserForm } from './UserForm';
+import { useConfirm } from './ConfirmDialog';
 
 interface Props {
   users: User[];
@@ -16,13 +17,20 @@ interface Props {
 export function PeopleView({ users, canManage, currentEmail, onChanged, notify }: Props) {
   const [form, setForm] = useState<{ mode: 'create' } | { mode: 'edit'; user: User } | null>(null);
   const real = users.filter((u) => u.email); // remove o sentinela "DEFINIR"
+  const confirm = useConfirm();
 
   const remove = async (u: User) => {
     if (u.email.toLowerCase() === currentEmail.toLowerCase()) {
       notify('Você não pode excluir a própria conta.');
       return;
     }
-    if (!window.confirm(`Excluir o usuário ${u.displayName || u.name}?`)) return;
+    const ok = await confirm({
+      title: 'Excluir usuário?',
+      message: `${u.displayName || u.name} perderá o acesso e será removido da lista. Esta ação não pode ser desfeita.`,
+      confirmLabel: 'Sim, remover',
+      danger: true,
+    });
+    if (!ok) return;
     try {
       await api.deleteUser(u.id);
       play('move');

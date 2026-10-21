@@ -9,6 +9,7 @@ import { Avatar } from './Avatar';
 import { StatusBadge } from './StatusBadge';
 import { ProgressBar } from './ProgressBar';
 import { CommentEditor } from './CommentEditor';
+import { useConfirm } from './ConfirmDialog';
 
 type Tab = 'comentarios' | 'anexos' | 'historico';
 
@@ -50,6 +51,7 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify }
   const [attnTargets, setAttnTargets] = useState<string[]>([]);
   const attachRef = useRef<HTMLInputElement>(null);
   useEscape(onClose);
+  const confirm = useConfirm();
 
   const responsibles = Array.isArray(task.responsible) ? task.responsible : [];
   const comments = Array.isArray(task.comments) ? task.comments : [];
@@ -141,8 +143,14 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify }
       setEditingId(null);
     }, 'Falha ao editar o comentário.');
   };
-  const deleteCommentAt = (index: number) => {
-    if (!window.confirm('Excluir este comentário?')) return;
+  const deleteCommentAt = async (index: number) => {
+    const ok = await confirm({
+      title: 'Excluir comentário?',
+      message: 'O comentário será removido permanentemente.',
+      confirmLabel: 'Sim, remover',
+      danger: true,
+    });
+    if (!ok) return;
     void run(() => api.deleteComment(task.id, index), 'Falha ao excluir o comentário.');
   };
 
@@ -163,7 +171,14 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify }
       'Falha ao salvar anexos.',
     );
   };
-  const removeTaskAttachment = (index: number) => {
+  const removeTaskAttachment = async (index: number) => {
+    const ok = await confirm({
+      title: 'Remover anexo?',
+      message: `“${attachments[index]?.name ?? 'Este anexo'}” será removido da tarefa.`,
+      confirmLabel: 'Sim, remover',
+      danger: true,
+    });
+    if (!ok) return;
     void run(
       () => api.updateTask(task.id, { attachments: attachments.filter((_, i) => i !== index), expectedStatus: task.status, expectedEtag: task._etag }),
       'Falha ao remover o anexo.',
