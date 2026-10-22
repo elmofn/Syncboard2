@@ -3,7 +3,7 @@ import type { Task, User, ClientPrincipal, PersonRef, Attachment } from '../type
 import { personName, personEmail } from '../types/api';
 import { usePersonResolver } from '../lib/people';
 import { isImageAttachment } from '../lib/attachments';
-import { googleCalendarUrl } from '../lib/calendar';
+import { buildMeetingPayload, CALENDAR_CONNECT_URL } from '../lib/calendar';
 import { api } from '../lib/api';
 import { useEscape } from '../lib/useEscape';
 import { play } from '../lib/sound';
@@ -190,13 +190,26 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify, 
 
   const dismiss = () => run(async () => { await api.dismissAlert(task.id, task._etag); play('move'); }, 'Falha ao confirmar.');
 
-  // Abre o Google Agenda em nova aba com a reunião já preenchida a partir da
-  // tarefa (o usuário escolhe data/hora e confirma dentro do próprio Google).
-  const openMeeting = () => {
-    window.open(googleCalendarUrl(task, myEmail), '_blank', 'noopener,noreferrer');
-    play('notify');
-    notify('Abrindo o Google Agenda com a reunião pré-preenchida.');
-  };
+  // Cria a reunião de fato no Google Agenda do usuário (convites + Meet) via
+  // backend. Se a agenda ainda não estiver conectada, o backend responde 428 e
+  // abrimos o consentimento num popup — o usuário conecta e clica de novo.
+  const openMeeting = () =>
+    run(async () => {
+      const payload = buildMeetingPayload(task, myEmail);
+      try {
+        const { htmlLink } = await api.createMeeting(payload);
+        if (htmlLink) window.open(htmlLink, '_blank', 'noopener,noreferrer');
+        play('success');
+        notify('Reunião criada no Google Agenda e convites enviados.');
+      } catch (e) {
+        if ((e as { status?: number }).status === 428) {
+          window.open(CALENDAR_CONNECT_URL, 'gcal-connect', 'popup,width=520,height=640');
+          notify('Conecte seu Google Agenda na janela que abriu e clique em "Marcar reunião" novamente.');
+          return;
+        }
+        throw e;
+      }
+    }, 'Falha ao criar a reunião no Google Agenda.');
 
   const saveEditComment = (commentId: string, authorEmail: string) => {
     const html = editRef.current?.innerHTML.trim() ?? '';

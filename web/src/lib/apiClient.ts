@@ -1,4 +1,5 @@
 import type { Task, User, Notification, CreateTaskPayload, ProjectCount, Attachment, UserInput } from '../types/api';
+import type { MeetingPayload } from './calendar';
 
 /** Patch genérico de tarefa; aceita os auxiliares de concorrência do contrato. */
 export type TaskPatch = Partial<Task> & {
@@ -6,6 +7,15 @@ export type TaskPatch = Partial<Task> & {
   expectedEtag?: string;
   [key: string]: unknown;
 };
+
+export interface CalendarStatus {
+  connected: boolean;
+}
+export interface MeetingResult {
+  htmlLink: string;
+  hangoutLink?: string | null;
+  id?: string;
+}
 
 export interface ApiClient {
   getTasks(): Promise<Task[]>;
@@ -28,4 +38,8 @@ export interface ApiClient {
   addUser(payload: UserInput): Promise<User>;
   updateUser(id: string, payload: UserInput): Promise<User>;
   deleteUser(id: string): Promise<void>;
+  /** Google Agenda: situação da conexão do usuário atual. */
+  calendarStatus(): Promise<CalendarStatus>;
+  /** Google Agenda: cria o evento; rejeita com status 428 se não conectado. */
+  createMeeting(payload: MeetingPayload): Promise<MeetingResult>;
 }
