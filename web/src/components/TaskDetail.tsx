@@ -3,6 +3,7 @@ import type { Task, User, ClientPrincipal, PersonRef, Attachment } from '../type
 import { personName, personEmail } from '../types/api';
 import { usePersonResolver } from '../lib/people';
 import { isImageAttachment } from '../lib/attachments';
+import { googleCalendarUrl } from '../lib/calendar';
 import { api } from '../lib/api';
 import { useEscape } from '../lib/useEscape';
 import { play } from '../lib/sound';
@@ -188,6 +189,14 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify, 
   };
 
   const dismiss = () => run(async () => { await api.dismissAlert(task.id, task._etag); play('move'); }, 'Falha ao confirmar.');
+
+  // Abre o Google Agenda em nova aba com a reunião já preenchida a partir da
+  // tarefa (o usuário escolhe data/hora e confirma dentro do próprio Google).
+  const openMeeting = () => {
+    window.open(googleCalendarUrl(task, myEmail), '_blank', 'noopener,noreferrer');
+    play('notify');
+    notify('Abrindo o Google Agenda com a reunião pré-preenchida.');
+  };
 
   const saveEditComment = (commentId: string, authorEmail: string) => {
     const html = editRef.current?.innerHTML.trim() ?? '';
@@ -542,7 +551,7 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify, 
               {myAlert && (
                 <button type="button" className="sb-button" disabled={busy} onClick={dismiss}><Eye /> Vou olhar</button>
               )}
-              <button type="button" className="sb-button sb-button--secondary" onClick={() => notify('Marcar reunião: integração de calendário chega num próximo passo.')}><CalendarBlank /> Marcar reunião</button>
+              <button type="button" className="sb-button sb-button--secondary" onClick={openMeeting}><CalendarBlank /> Marcar reunião</button>
             </div>
           </aside>
         </div>
