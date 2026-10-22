@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef, useState } from 'react';
 import type { Task, User, ClientPrincipal, PersonRef, Attachment } from '../types/api';
 import { personName, personEmail } from '../types/api';
 import { usePersonResolver } from '../lib/people';
+import { isImageAttachment } from '../lib/attachments';
 import { api } from '../lib/api';
 import { useEscape } from '../lib/useEscape';
 import { play } from '../lib/sound';
@@ -102,8 +103,10 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify, 
   const [editingId, setEditingId] = useState<string | null>(null);
   const editRef = useRef<HTMLDivElement>(null);
   const [attnOpen, setAttnOpen] = useState(false);
+  const [lightbox, setLightbox] = useState<string | null>(null);
   const attachRef = useRef<HTMLInputElement>(null);
   useEscape(close);
+  useEscape(() => setLightbox(null), lightbox !== null);
   const confirm = useConfirm();
 
   const responsibles = Array.isArray(task.responsible) ? task.responsible : [];
@@ -344,9 +347,15 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify, 
                                   <Html className="comment__text" html={c.text} />
                                   {cAtts.length > 0 && (
                                     <div className="comment__atts">
-                                      {cAtts.map((a, j) => (
-                                        <a key={j} className="editor__attach-chip" href={a.url} target="_blank" rel="noreferrer"><File /> {a.name}</a>
-                                      ))}
+                                      {cAtts.map((a, j) =>
+                                        isImageAttachment(a) ? (
+                                          <button key={j} type="button" className="att-img" title={a.name} onClick={() => setLightbox(a.url)}>
+                                            <img src={a.url} alt={a.name} loading="lazy" />
+                                          </button>
+                                        ) : (
+                                          <a key={j} className="editor__attach-chip" href={a.url} target="_blank" rel="noreferrer"><File /> {a.name}</a>
+                                        ),
+                                      )}
                                     </div>
                                   )}
                                 </div>
@@ -386,12 +395,18 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify, 
                   <ul className="attachments">
                     {attachments.map((a, i) => (
                       <li key={i} className="attachment">
-                        <span className="attachment__icon" aria-hidden="true">
-                          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z" /><path d="M14 3v5h5" /></svg>
-                        </span>
+                        {isImageAttachment(a) ? (
+                          <button type="button" className="attachment__thumb" title={`Ver ${a.name}`} onClick={() => setLightbox(a.url)}>
+                            <img src={a.url} alt={a.name} loading="lazy" />
+                          </button>
+                        ) : (
+                          <span className="attachment__icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z" /><path d="M14 3v5h5" /></svg>
+                          </span>
+                        )}
                         <div>
                           <strong>{a.name}</strong>
-                          <small className="sb-meta">Vinculado à tarefa</small>
+                          <small className="sb-meta">{isImageAttachment(a) ? 'Imagem · clique para ampliar' : 'Vinculado à tarefa'}</small>
                         </div>
                         <a className="attachment__view" href={a.url} target="_blank" rel="noreferrer" aria-label="Abrir anexo">
                           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" /></svg>
@@ -548,6 +563,13 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify, 
           onConfirm={confirmAttn}
           onClose={() => setAttnOpen(false)}
         />
+      )}
+
+      {lightbox && (
+        <div className="lightbox" role="dialog" aria-modal="true" aria-label="Visualização da imagem" onClick={() => setLightbox(null)}>
+          <img src={lightbox} alt="" onClick={(e) => e.stopPropagation()} />
+          <button type="button" className="lightbox__close" onClick={() => setLightbox(null)} aria-label="Fechar"><X /></button>
+        </div>
       )}
     </div>
   );
