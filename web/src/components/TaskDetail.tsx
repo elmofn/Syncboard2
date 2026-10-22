@@ -566,9 +566,15 @@ export function TaskDetail({ task, users, currentUser, onClose, onEdit, notify, 
       )}
 
       {lightbox && (
-        <div className="lightbox" role="dialog" aria-modal="true" aria-label="Visualização da imagem" onClick={() => setLightbox(null)}>
+        <div
+          className="lightbox"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Visualização da imagem"
+          onClick={(e) => { e.stopPropagation(); setLightbox(null); }}
+        >
           <img src={lightbox} alt="" onClick={(e) => e.stopPropagation()} />
-          <button type="button" className="lightbox__close" onClick={() => setLightbox(null)} aria-label="Fechar"><X /></button>
+          <button type="button" className="lightbox__close" onClick={(e) => { e.stopPropagation(); setLightbox(null); }} aria-label="Fechar"><X /></button>
         </div>
       )}
     </div>
