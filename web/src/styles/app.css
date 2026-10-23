@@ -1929,6 +1929,79 @@
 .topbar__notif {
   position: relative;
 }
+
+/* Menu de conta no avatar do topo */
+.topbar__user {
+  position: relative;
+}
+.topbar__user-btn {
+  display: inline-flex;
+  padding: 0;
+  border: none;
+  background: transparent;
+  border-radius: 50%;
+  cursor: pointer;
+  line-height: 0;
+}
+.topbar__user-btn:focus-visible {
+  outline: 2px solid var(--sb-action);
+  outline-offset: 2px;
+}
+.topbar__menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  min-width: 220px;
+  max-width: 90vw;
+  background: var(--sb-panel);
+  border: 1px solid var(--sb-panel-border);
+  border-radius: var(--sb-radius-panel);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.18);
+  padding: var(--sb-sp-2);
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sb-sp-1);
+}
+.topbar__menu-head {
+  display: flex;
+  align-items: center;
+  gap: var(--sb-sp-2);
+  padding: var(--sb-sp-2);
+}
+.topbar__menu-id {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.topbar__menu-id strong {
+  font-size: var(--sb-fs-body);
+}
+.topbar__menu-id small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 160px;
+}
+.topbar__menu-item {
+  display: flex;
+  align-items: center;
+  gap: var(--sb-sp-2);
+  width: 100%;
+  padding: var(--sb-sp-2);
+  border: none;
+  background: transparent;
+  border-top: 1px solid var(--sb-panel-border);
+  color: var(--sb-text);
+  font-size: var(--sb-fs-body);
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  border-radius: var(--sb-radius-sm, 8px);
+}
+.topbar__menu-item:hover {
+  background: var(--sb-surface-hover, rgba(127, 127, 127, 0.12));
+}
 .notif {
   position: absolute;
   right: 0;

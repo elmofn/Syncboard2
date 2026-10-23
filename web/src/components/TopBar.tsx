@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import { Bell, List } from '@phosphor-icons/react';
+import { Bell, List, SignOut } from '@phosphor-icons/react';
 import type { ClientPrincipal, Notification } from '../types/api';
+import { logout } from '../lib/auth';
 import { Avatar } from './Avatar';
 import { NotificationsPanel } from './NotificationsPanel';
 import { ThemeToggle } from './ThemeToggle';
@@ -17,9 +18,12 @@ interface Props {
 
 export function TopBar({ user, crumb, notifications, onMarkRead, onOpenTask, onToggleSidebar }: Props) {
   const name = user.claims?.find((c) => c.typ === 'name')?.val || user.userDetails;
+  const picture = user.claims?.find((c) => c.typ === 'picture')?.val;
   const unread = notifications.filter((n) => !n.isRead).length;
   const [open, setOpen] = useState(false);
+  const [userOpen, setUserOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const userRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -29,6 +33,15 @@ export function TopBar({ user, crumb, notifications, onMarkRead, onOpenTask, onT
     document.addEventListener('mousedown', onDoc);
     return () => document.removeEventListener('mousedown', onDoc);
   }, [open]);
+
+  useEffect(() => {
+    if (!userOpen) return;
+    const onDoc = (e: MouseEvent) => {
+      if (!userRef.current?.contains(e.target as Node)) setUserOpen(false);
+    };
+    document.addEventListener('mousedown', onDoc);
+    return () => document.removeEventListener('mousedown', onDoc);
+  }, [userOpen]);
 
   return (
     <div className="topbar">
@@ -55,7 +68,31 @@ export function TopBar({ user, crumb, notifications, onMarkRead, onOpenTask, onT
             />
           )}
         </div>
-        <Avatar person={{ email: user.userDetails, name, picture: user.claims?.find((c) => c.typ === 'picture')?.val }} small />
+        <div className="topbar__user" ref={userRef}>
+          <button
+            type="button"
+            className="topbar__user-btn"
+            aria-label="Conta"
+            aria-expanded={userOpen}
+            onClick={() => setUserOpen((v) => !v)}
+          >
+            <Avatar person={{ email: user.userDetails, name, picture }} small />
+          </button>
+          {userOpen && (
+            <div className="topbar__menu" role="menu">
+              <div className="topbar__menu-head">
+                <Avatar person={{ email: user.userDetails, name, picture }} small />
+                <div className="topbar__menu-id">
+                  <strong>{name}</strong>
+                  <small className="sb-meta">{user.userDetails}</small>
+                </div>
+              </div>
+              <button type="button" className="topbar__menu-item" role="menuitem" onClick={logout}>
+                <SignOut /> Sair
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
