@@ -36,6 +36,18 @@
       "allowedRoles": ["anonymous", "authenticated"]
     },
     {
+      "route": "/api/agent/tasks",
+      "allowedRoles": ["anonymous", "authenticated"]
+    },
+    {
+      "route": "/api/agent/tasks/*",
+      "allowedRoles": ["anonymous", "authenticated"]
+    },
+    {
+      "route": "/api/agent/users",
+      "allowedRoles": ["anonymous", "authenticated"]
+    },
+    {
       "route": "/*",
       "allowedRoles": [
         "travelcash_user"

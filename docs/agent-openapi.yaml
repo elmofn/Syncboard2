@@ -1,0 +1,145 @@
+openapi: 3.0.3
+info:
+  title: SyncBOARD Agent API
+  version: "1.0.0"
+  description: >
+    Superfície de máquina do SyncBOARD para agentes de IA (ex.: DOT). Reusa a
+    lógica dos endpoints humanos; o agente age como um usuário isAiAgent
+    cadastrado. Autenticação por chave de API. O agente não homologa.
+servers:
+  - url: https://syncboard.travelcash.me
+components:
+  securitySchemes:
+    AgentKey:
+      type: apiKey
+      in: header
+      name: x-agent-key
+  schemas:
+    Person:
+      type: object
+      required: [email]
+      properties:
+        email: { type: string, format: email }
+        name: { type: string }
+    Task:
+      type: object
+      properties:
+        id: { type: string }
+        title: { type: string }
+        description: { type: string }
+        status:
+          type: string
+          enum: [todo, stopped, inprogress, homologation, publication, done]
+        priority: { type: string, enum: [Baixa, Média, Alta] }
+        progress: { type: integer, minimum: 0, maximum: 100 }
+        missingToComplete: { type: string }
+        project: { type: string }
+        responsible: { type: array, items: { $ref: '#/components/schemas/Person' } }
+        homologador: { $ref: '#/components/schemas/Person' }
+        dueDate: { type: string, nullable: true }
+        _etag: { type: string }
+    CreateTask:
+      type: object
+      required: [title, responsible]
+      properties:
+        title: { type: string }
+        description: { type: string }
+        responsible: { type: array, items: { $ref: '#/components/schemas/Person' } }
+        homologador: { $ref: '#/components/schemas/Person' }
+        priority: { type: string, enum: [Baixa, Média, Alta] }
+        project: { type: string }
+        projectColor: { type: string }
+        dueDate: { type: string, nullable: true }
+    UpdateTask:
+      description: >
+        Campos a alterar. Para mudanças concorrentes-seguras, envie expectedStatus
+        e expectedEtag do estado lido; 409 se a tarefa mudou. Campos de decisão de
+        homologação são rejeitados (403).
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [todo, stopped, inprogress, homologation, publication, done]
+        progress: { type: integer, minimum: 0, maximum: 100 }
+        missingToComplete: { type: string }
+        responsible: { type: array, items: { $ref: '#/components/schemas/Person' } }
+        homologador: { $ref: '#/components/schemas/Person' }
+        priority: { type: string }
+        project: { type: string }
+        dueDate: { type: string, nullable: true }
+        expectedStatus: { type: string }
+        expectedEtag: { type: string }
+    AddComment:
+      type: object
+      required: [text]
+      properties:
+        text: { type: string, description: "HTML; suporta menções @ conforme o contrato." }
+security:
+  - AgentKey: []
+paths:
+  /api/agent/tasks:
+    get:
+      operationId: listTasks
+      summary: Lista todas as tarefas
+      responses:
+        '200':
+          description: Lista de tarefas
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/Task' } }
+        '401': { description: Chave ausente/inválida }
+    post:
+      operationId: createTask
+      summary: Cria uma tarefa (agente vira solicitante/criador)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateTask' }
+      responses:
+        '200': { description: Tarefa criada, content: { application/json: { schema: { $ref: '#/components/schemas/Task' } } } }
+        '400': { description: Payload inválido }
+        '401': { description: Chave ausente/inválida }
+  /api/agent/users:
+    get:
+      operationId: listUsers
+      summary: Lista usuários (e-mails válidos para responsável/homologador)
+      responses:
+        '200': { description: Lista de usuários }
+        '401': { description: Chave ausente/inválida }
+  /api/agent/tasks/{id}:
+    put:
+      operationId: updateTask
+      summary: Atualiza a tarefa (mover, progresso, status, responsáveis)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UpdateTask' }
+      responses:
+        '200': { description: Tarefa atualizada, content: { application/json: { schema: { $ref: '#/components/schemas/Task' } } } }
+        '403': { description: Ação de homologação não permitida ao agente }
+        '409': { description: Conflito de concorrência (reabra e tente de novo) }
+        '401': { description: Chave ausente/inválida }
+  /api/agent/tasks/{id}/comments:
+    post:
+      operationId: addComment
+      summary: Comenta na tarefa (atribuído ao agente)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AddComment' }
+      responses:
+        '200': { description: Comentário adicionado, content: { application/json: { schema: { $ref: '#/components/schemas/Task' } } } }
+        '401': { description: Chave ausente/inválida }
