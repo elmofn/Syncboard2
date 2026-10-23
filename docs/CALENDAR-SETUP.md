@@ -59,8 +59,11 @@ criação responde 428 e o fluxo de conexão recomeça.
 - `GET  /api/calendar/callback` → troca o code, guarda o refresh token cifrado
 - `POST /api/createMeeting`     → cria o evento; **428** se não conectado
 
-Nenhuma rota nova é anônima: todas exigem o login do SWA (o callback funciona
-porque o navegador do usuário carrega o cookie de sessão).
+O `/api/calendar/callback` é **anônimo** na plataforma (o cookie do SWA não
+volta do Google em navegação cross-site). A identidade do usuário vem do
+`state` assinado por HMAC que o `/authorize` (esse sim autenticado) gerou — ou
+seja, só um e-mail que passou pelo login do SWA pode ser gravado. As demais
+rotas exigem o login do SWA normalmente.
 
 ## Segurança
 

@@ -23,15 +23,10 @@ function page(title, message, ok) {
 // Recebe o retorno do Google, troca o code por tokens e guarda o refresh_token
 // (cifrado) no doc do usuário logado. Responde com uma página que fecha o popup.
 module.exports = async function (context, req) {
-  const email = cal.getEmail(cal.getPrincipal(req));
   const html = (title, msg, ok, status) => {
     context.res = { status: status || 200, headers: { "Content-Type": "text/html; charset=utf-8" }, body: page(title, msg, ok) };
   };
 
-  if (!email) {
-    html("Sessão expirada", "Faça login no SyncBOARD e tente conectar novamente.", false, 401);
-    return;
-  }
   if (req.query.error) {
     html("Permissão negada", "Você não autorizou o acesso ao Google Agenda.", false, 400);
     return;
@@ -41,10 +36,14 @@ module.exports = async function (context, req) {
     html("Retorno inválido", "O Google não retornou o código de autorização.", false, 400);
     return;
   }
-  if (!cal.verifyState(req.query.state, email)) {
+  // Rota anônima: o cookie do SWA não volta do Google (cross-site). A identidade
+  // vem do state assinado (HMAC), produzido pelo /authorize já autenticado.
+  const parsed = cal.readState(req.query.state);
+  if (!parsed) {
     html("Estado inválido", "A sessão de autorização expirou. Tente conectar novamente.", false, 400);
     return;
   }
+  const email = parsed.email;
 
   try {
     const client = cal.oauthClient(req);

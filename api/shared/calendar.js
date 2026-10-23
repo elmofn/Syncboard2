@@ -92,18 +92,23 @@ function signState(email) {
   const sig = crypto.createHmac("sha256", key()).update(payload).digest("base64url");
   return `${payload}.${sig}`;
 }
-function verifyState(state, email) {
-  if (!state || typeof state !== "string" || !state.includes(".")) return false;
+// Verifica o HMAC + validade e devolve o e-mail embutido no state (ou null). O
+// callback é anônimo (o cookie do SWA não volta do Google em contexto
+// cross-site), então o state assinado é a fonte confiável de identidade.
+function readState(state) {
+  if (!state || typeof state !== "string" || !state.includes(".")) return null;
   const [payload, sig] = state.split(".");
   const expected = crypto.createHmac("sha256", key()).update(payload).digest("base64url");
-  if (sig !== expected) return false;
+  const a = Buffer.from(sig);
+  const b = Buffer.from(expected);
+  if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) return null;
   try {
     const data = JSON.parse(Buffer.from(payload, "base64url").toString("utf8"));
-    if (data.e !== email) return false;
-    if (Date.now() - data.t > 10 * 60 * 1000) return false; // 10 min
-    return true;
+    if (!data.e) return null;
+    if (Date.now() - data.t > 10 * 60 * 1000) return null; // 10 min
+    return { email: String(data.e).toLowerCase() };
   } catch {
-    return false;
+    return null;
   }
 }
 
@@ -145,7 +150,7 @@ module.exports = {
   getRedirectUri,
   oauthClient,
   signState,
-  verifyState,
+  readState,
   saveRefreshToken,
   getRefreshToken,
   clearRefreshToken,
