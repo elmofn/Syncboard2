@@ -36,11 +36,6 @@
       "allowedRoles": ["anonymous", "authenticated"]
     },
     {
-      "route": "/api/calendar/callback",
-      "methods": ["GET"],
-      "allowedRoles": ["anonymous", "authenticated"]
-    },
-    {
       "route": "/*",
       "allowedRoles": [
         "travelcash_user"

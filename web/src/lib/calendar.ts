@@ -1,7 +1,7 @@
 import type { Task, PersonRef } from '../types/api';
 import { personEmail } from '../types/api';
 
-/** Payload de criação de reunião enviado ao backend (POST /api/createMeeting). */
+/** Dados da reunião derivados da tarefa, usados para montar a URL do Google Agenda. */
 export interface MeetingPayload {
   taskId?: string;
   title: string;
@@ -11,9 +11,6 @@ export interface MeetingPayload {
   end: string; // ISO
   addMeet?: boolean;
 }
-
-/** Endpoint que inicia o consentimento OAuth do Google Agenda (abrir em popup). */
-export const CALENDAR_CONNECT_URL = '/api/calendar/authorize';
 
 // Janela padrão da reunião: próxima hora cheia, 30 min. O usuário ajusta depois.
 function nextSlot(): { start: Date; end: Date } {
@@ -70,11 +67,12 @@ function gcalDate(iso: string): string {
 }
 
 /**
- * URL do compositor do Google Agenda pré-preenchido a partir do payload. Usado
- * como stand-in no modo mock (e como degradação graciosa, se preciso): abre a
- * tela de criação de evento do Google, sem criar nada automaticamente.
+ * URL do formulário de novo evento do Google Agenda, pré-preenchido a partir do
+ * payload. Abre a tela de criação (campos editáveis: dia/hora, convidados, etc.)
+ * — não cria nada sozinho; o Google cria ao salvar. `authUser` (e-mail) força a
+ * conta certa quando há múltiplas contas Google no navegador.
  */
-export function googleCalendarUrl(p: MeetingPayload): string {
+export function googleCalendarUrl(p: MeetingPayload, authUser?: string): string {
   const params = new URLSearchParams({
     action: 'TEMPLATE',
     text: p.title,
@@ -82,5 +80,6 @@ export function googleCalendarUrl(p: MeetingPayload): string {
   });
   if (p.description) params.set('details', p.description);
   if (p.attendees.length > 0) params.set('add', p.attendees.join(','));
+  if (authUser) params.set('authuser', authUser);
   return `https://calendar.google.com/calendar/render?${params.toString()}`;
 }

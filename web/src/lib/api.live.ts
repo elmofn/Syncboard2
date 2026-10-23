@@ -1,5 +1,4 @@
-import type { ApiClient, TaskPatch, CalendarStatus, MeetingResult } from './apiClient';
-import type { MeetingPayload } from './calendar';
+import type { ApiClient, TaskPatch } from './apiClient';
 import type { Task, User, Notification, CreateTaskPayload, ProjectCount, Attachment, UserInput } from '../types/api';
 
 // Cliente real contra /api/* (ver docs/API.md). A autenticação é via cookie
@@ -105,9 +104,4 @@ export const liveApi: ApiClient = {
 
   deleteUser: (id: string) =>
     req<void>(`/api/deleteUser/${encodeURIComponent(id)}`, { method: 'DELETE' }),
-
-  calendarStatus: () => req<CalendarStatus>('/api/calendar/status', { cache: 'no-store' }),
-
-  createMeeting: (payload: MeetingPayload) =>
-    req<MeetingResult>('/api/createMeeting', { method: 'POST', body: JSON.stringify(payload) }),
 };

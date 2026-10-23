@@ -1,6 +1,4 @@
-import type { ApiClient, TaskPatch, CalendarStatus, MeetingResult } from './apiClient';
-import type { MeetingPayload } from './calendar';
-import { googleCalendarUrl } from './calendar';
+import type { ApiClient, TaskPatch } from './apiClient';
 import type { Task, CreateTaskPayload, Attachment, HistoryEntry, UserInput, User } from '../types/api';
 import { store } from './mock/store';
 import { mockCurrentPrincipal } from './mock/fixtures';
@@ -291,16 +289,5 @@ export const mockApi: ApiClient = {
   async deleteUser(id: string) {
     await delay();
     store.users = store.users.filter((u) => u.id !== id && u.email !== id);
-  },
-
-  // No mock não há backend/Google: a agenda é tida como conectada e a "criação"
-  // devolve o link do compositor pré-preenchido como stand-in (abre o Google).
-  async calendarStatus(): Promise<CalendarStatus> {
-    await delay(60);
-    return { connected: true };
-  },
-  async createMeeting(payload: MeetingPayload): Promise<MeetingResult> {
-    await delay();
-    return { htmlLink: googleCalendarUrl(payload), hangoutLink: null };
   },
 };
